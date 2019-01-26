@@ -15,7 +15,7 @@ export default class Scene extends Phaser.Scene {
         this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: width / 4, y: height / 2, radius: 100})
         this.joyStick.on('update', this.handleJoyStickState, this);
 
-        this.button = this.add.sprite(width - (width / 4), height /2, 'button').setInteractive();
+        this.button = this.add.sprite(width - (width / 4), height /2, 'button').setInteractive().setScale(0.5, 0.5);
 
         this.button.on('pointerdown', function () {
             this.setAlpha(0.5);
