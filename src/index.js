@@ -16,7 +16,7 @@ if (window.spectator){
 else {
     scene = Scene;
     wid = window.innerWidth;
-    hei = window.innerWidth;
+    hei = window.innerHeight;
 }
 
 var config = {
