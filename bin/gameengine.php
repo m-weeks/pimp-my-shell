@@ -1,4 +1,3 @@
-
 <?php
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -17,13 +16,11 @@ use Ratchet\Http\HttpServerInterface;
 class GameEngine implements MessageComponentInterface
 {
     protected $clients;
-    
 
     public function __construct(React\EventLoop\LoopInterface $loop)
     {
         $this->clients = new \SplObjectStorage;
         
-
         echo "server started\n";
     }
 
@@ -36,6 +33,11 @@ class GameEngine implements MessageComponentInterface
     {
         echo "connected: " . $conn->resourceId . "\n";
         $this->clients->attach($conn);
+        foreach($clients as $client) {
+            if ($conn->resourceId !== $client->resourceId){
+                $client->send(json_encode("resourceid: $conn->resourceId"));
+            }
+        }
     }
 
     /**
@@ -46,6 +48,8 @@ class GameEngine implements MessageComponentInterface
     function onClose(Ratchet\ConnectionInterface $conn)
     {
         echo $conn->resourceId . " has disconnected\n";
+        $index = array_search($conn, $clients);
+        unset($clients[$index]);
     }
 
     /**
@@ -58,7 +62,8 @@ class GameEngine implements MessageComponentInterface
     function onError(Ratchet\ConnectionInterface $conn, Exception $e)
     {
         echo "An error has occurred: {$e->getMessage()}\n";
-
+        $index = array_search($conn, $clients);
+        unset($clients[$index]);
         $conn->close();
     }
 
@@ -77,8 +82,5 @@ class GameEngine implements MessageComponentInterface
                 $client->send($msg);
             }
         }
-
-
-
     }
 }
