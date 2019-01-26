@@ -9,7 +9,7 @@ use Ratchet\WebSocket\WsServer;
 use Ratchet\Session\SessionProvider;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler;
 use Ratchet\Http\HttpServerInterface;
-require "src\\GameEngine.php";
+require "bin\\gameengine.php";
 
 
 
