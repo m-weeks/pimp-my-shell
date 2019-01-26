@@ -59,7 +59,10 @@ export default class Scene extends Phaser.Scene {
         this.load.spritesheet('crab4', 'assets/crabs/yellowcrab/yellowcrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
 
         this.load.image('arrow', 'assets/arrow.png');
-        this.load.image('map', 'assets/island.png')
+        this.load.image('map', 'assets/island.png');
+
+        this.load.audio('pedro', ['assets/audio/pedro.mp3']);
+        this.load.audio('snip', ['assets/audio/snip.wav'])
 
         // Load furniture images
         FURNITURE_NAMES.forEach(name => {
@@ -136,6 +139,9 @@ export default class Scene extends Phaser.Scene {
                     break;
             };
         };
+
+        this.music = this.sound.add('pedro');
+        this.music.play();
     }
 
     update() {

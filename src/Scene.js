@@ -9,7 +9,6 @@ export default class Scene extends Phaser.Scene {
     }
 
     create() {
-        // this.input.addPointer();
         let height = this.game.config.height;
         let width = this.game.config.width;
         this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: width / 4, y: height / 2, radius: 100})

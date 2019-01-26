@@ -7,6 +7,8 @@ export default class Player {
 
         this.sprite.setScale(0.25,0.25);
 
+        this.snip = scene.sound.add('snip');
+
         this.walkanim = scene.anims.create({
             key: 'walk-' + this.key,
             frames: scene.anims.generateFrameNumbers(this.key, { start: 1, end: 2 }),
@@ -37,6 +39,7 @@ export default class Player {
         let attackHitbox = this.scene.add.zone(this.sprite.x + Math.cos(this.toRad(this.sprite.angle)) * 70 - 25, this.sprite.y + Math.sin(this.toRad(this.sprite.angle)) * 70 - 25).setSize(50,50);
         this.scene.physics.world.enable(attackHitbox);
         this.sprite.anims.play('attack-' + this.key);
+        this.snip.play();
         attackHitbox.body.moves = false;
 
         players.forEach(curplayer => {
