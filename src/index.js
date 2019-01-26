@@ -5,10 +5,10 @@ import VirtualJoyStickPlugin  from './plugins/rexvirtualjoystickplugin.min';
 let scene;
 
 if (window.spectator){
-     scene = SpectatorScene;
+    scene = SpectatorScene;
 }
 else {
-     scene = Scene;
+    scene = Scene;
 }
 
 var config = {
