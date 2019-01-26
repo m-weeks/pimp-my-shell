@@ -25,6 +25,9 @@ export default class Scene extends Phaser.Scene {
     handleJoyStickState() {
         let angle = this.joyStick.angle;
         let force = this.joyStick.force;
+        force = force > 100 ? 100 : force;
+        force /= 100.0
+        console.log(force);
 
         let msg = {
             type: MSG_TYPE_PLAYER_MOVE,
