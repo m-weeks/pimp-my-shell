@@ -33,9 +33,15 @@ class GameEngine implements MessageComponentInterface
     {
         echo "connected: " . $conn->resourceId . "\n";
         $this->clients->attach($conn);
-        foreach($clients as $client) {
+        foreach($this->clients as $client) {
             if ($conn->resourceId !== $client->resourceId){
-                $client->send(json_encode("resourceid: $conn->resourceId"));
+                $connection_obj = array(
+                    'type' => 'newConnection',
+                    'resourceId' => $conn->resourceId
+                );
+
+
+                $client->send(json_encode($connection_obj));
             }
         }
     }
@@ -48,8 +54,7 @@ class GameEngine implements MessageComponentInterface
     function onClose(Ratchet\ConnectionInterface $conn)
     {
         echo $conn->resourceId . " has disconnected\n";
-        $index = array_search($conn, $clients);
-        unset($clients[$index]);
+        $this->clients->detach($conn);
     }
 
     /**
@@ -62,8 +67,7 @@ class GameEngine implements MessageComponentInterface
     function onError(Ratchet\ConnectionInterface $conn, Exception $e)
     {
         echo "An error has occurred: {$e->getMessage()}\n";
-        $index = array_search($conn, $clients);
-        unset($clients[$index]);
+        $this->clients->detach($conn);
         $conn->close();
     }
 
@@ -75,11 +79,13 @@ class GameEngine implements MessageComponentInterface
      */
     function onMessage(Ratchet\ConnectionInterface $from, $msg)
     {
-        echo "message received\n";
+        $message = json_decode($msg);
+        
+        $message->resourceId = $from->resourceId;
         
         foreach($this->clients as $client){
             if ($from !== $client){
-                $client->send($msg);
+                $client->send(json_encode($message));
             }
         }
     }
