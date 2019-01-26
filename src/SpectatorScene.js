@@ -1,6 +1,6 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, CAMERA_GUTTER } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, CAMERA_GUTTER, MAX_SPEED } from './constants';
 
 let numPlayers = 4;
 let cameras = [];
@@ -48,7 +48,7 @@ export default class Scene extends Phaser.Scene {
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-            let force = msg.joystick.force;
+            let force = msg.joystick.force * MAX_SPEED;
             let angle = msg.joystick.angle;
 
             players.forEach(player => {
