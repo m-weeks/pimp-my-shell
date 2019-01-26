@@ -11,7 +11,7 @@ var config = {
             gravity: { y: 200 }
         }
     },
-    scene: Scene
+    scene: Scene.new()
 };
 
 var game = new Phaser.Game(config);
