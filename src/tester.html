@@ -1,0 +1,14 @@
+<html>
+    <body>
+        <script>
+            window.conn = new WebSocket('ws://204.83.143.122:44444/server');
+            window.conn.onopen = function (e) {
+                console.log('Connection Established!');
+            };
+
+            window.conn.onmessage = function (e) {
+                console.log(e.data);
+            };
+        </script>
+    </body>
+</html>
