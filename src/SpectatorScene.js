@@ -1,10 +1,12 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, CAMERA_GUTTER, MAX_SPEED } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED } from './constants';
 
+let currentPlayer = 0;
 let numPlayers = 4;
 let cameras = [];
 let players = [];
+let connectionIds = {};
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -33,8 +35,8 @@ export default class Scene extends Phaser.Scene {
 
         // Player creation
         players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'arrow'));
         players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY, 'arrow'));
+        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'arrow'));
         players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY + height, 'arrow'));
 
         players.forEach(player => {
@@ -48,14 +50,24 @@ export default class Scene extends Phaser.Scene {
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-            let force = msg.joystick.force * MAX_SPEED;
-            let angle = msg.joystick.angle;
 
-            players.forEach(player => {
-                player.setAngle(angle);
-                player.setVelocityX(force * Math.cos(angle * Math.PI/180));
-                player.setVelocityY(force * Math.sin(angle * Math.PI/180));
-            });
+            switch (msg.type) {
+                case MSG_TYPE_NEW_CONNECTION:
+                    if (currentPlayer < numPlayers) {
+                        connectionIds[msg.resourceId] = currentPlayer++;
+                    }
+                    break;
+                case MSG_TYPE_PLAYER_MOVE:
+                    let force = msg.joystick.force * MAX_SPEED;
+                    let angle = msg.joystick.angle;
+
+                    let player = players[connectionIds[msg.resourceId]];
+
+                    player.setAngle(angle);
+                    player.setVelocityX(force * Math.cos(angle * Math.PI/180));
+                    player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+                    break;
+            };
         };
     }
 
