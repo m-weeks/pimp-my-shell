@@ -76,12 +76,6 @@ export default class Scene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         // Player creation
-        players.push(this.physics.add.sprite( 'arrow'));
-        players.push(this.physics.add.sprite( 'arrow'));
-        players.push(this.physics.add.sprite( 'arrow'));
-        players.push(this.physics.add.sprite( 'arrow'));
-
-        // Player creation
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'),this));
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'crab2'),this));
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'),this));
@@ -105,7 +99,7 @@ export default class Scene extends Phaser.Scene {
         createItem(this, new Plant(HIGH_FANCINESS), cameraCenterX + 100 + width, 200 + cameraCenterY);
 
         players.forEach(player => {
-            this.physics.add.overlap(player, items, itemCollision);
+            this.physics.add.overlap(player.sprite, items, itemCollision);
         });
 
         players.forEach(player => {
