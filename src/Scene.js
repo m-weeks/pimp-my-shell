@@ -1,6 +1,6 @@
 import 'phaser';
 
-export class Scene extends Phaser.Scene {
+export default class Scene extends Phaser.Scene {
     preload() {
 
     }
