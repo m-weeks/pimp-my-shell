@@ -4,7 +4,8 @@ import {
     MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED,
     LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART, 
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
-    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART      
+    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART, 
+    MAP_HEIGHT, MAP_WIDTH
 } from './constants';
 import Plant from './classes/Plant';
 import Lamp from './classes/Lamp';
@@ -48,12 +49,12 @@ let numPlayers = 4;
 let cameras = [];
 let players = [];
 let connectionIds = {};
-let items = [];
+let items = null;
 
 export default class Scene extends Phaser.Scene {
     preload() {
         this.load.image('arrow', 'assets/arrow.png');
-        this.load.image('beach', 'assets/beach.jpeg');
+        this.load.image('map', 'assets/island.png')
 
         // Load furniture images
         FURNITURE_NAMES.forEach(name => {
@@ -63,11 +64,17 @@ export default class Scene extends Phaser.Scene {
 
     create() {
         // Camera and World creation
-        let height = this.game.config.height / 2;
-        let width = this.game.config.width / 2;
+        let height = window.innerHeight / 2;
+        let width = window.innerWidth / 2;
+        
+        this.add.image(0, 0, 'map').setOrigin(0, 0);
+        this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
-        this.add.tileSprite(0, 0, width * 4, height * 4, 'beach'); //test code
-        this.physics.world.setBounds(0, 0, width * 2, height * 2);
+        // Player creation
+        players.push(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'arrow'));
+        players.push(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'arrow'));
+        players.push(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'arrow'));
+        players.push(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'arrow'));
 
         this.cameras.main.setSize(width - CAMERA_GUTTER, height - CAMERA_GUTTER);
         this.cameras.main.setPosition(0, 0);
@@ -80,19 +87,15 @@ export default class Scene extends Phaser.Scene {
         let cameraCenterX = width / 2;
         let cameraCenterY = height / 2;
 
-        // Player creation
-        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY + height, 'arrow'));
+        items = this.physics.add.group();
 
-        let plant = new Plant(LOW_FANCINESS);
+        createItem(this, new Plant(LOW_FANCINESS), cameraCenterX + 100 + width, cameraCenterY);
+        createItem(this, new Plant(MID_FANCINESS), cameraCenterX + 200 + width, cameraCenterY);
+        createItem(this, new Plant(HIGH_FANCINESS), cameraCenterX + 100 + width, 200 + cameraCenterY);
 
-        items.push(this.physics.add.sprite(cameraCenterX + 100, cameraCenterY, LOW_PLANT));
-       
-        items[0].item = plant;
-        this.physics.add.sprite(cameraCenterX + 100 + width, cameraCenterY, MID_PLANT);
-        this.physics.add.sprite(cameraCenterX + 100, cameraCenterY + height, HIGH_PLANT);
+        players.forEach(player => {
+            this.physics.add.overlap(player, items, itemCollision);
+        });
 
         players.forEach(player => {
             player.setCollideWorldBounds(true);
@@ -100,7 +103,7 @@ export default class Scene extends Phaser.Scene {
 
         cameras.forEach((camera, index) => {
             camera.startFollow(players[index]);
-            camera.setBounds(0, 0, width * 2, height * 2); 
+            camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT); 
         });
 
         conn.onmessage = function (msg) {
@@ -128,9 +131,20 @@ export default class Scene extends Phaser.Scene {
     }
 
     update() {
-        //check for collision with item
-        players.forEach(player => {
-            
-        });
+
     }
+}
+
+function createItem(scene, furniture, x, y) {
+    // create physics item
+    let item = scene.physics.add.sprite(x, y, furniture.image);
+    item.item = furniture;
+    items.add(item);
+}
+
+function itemCollision(player, item) {
+    console.log('collision')
+    items.killAndHide(item);
+
+    item.body.enable = false;
 }

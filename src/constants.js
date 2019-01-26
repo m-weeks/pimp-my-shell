@@ -2,7 +2,8 @@ export const MSG_TYPE_PLAYER_MOVE = 'playerMove';
 export const MSG_TYPE_NEW_CONNECTION = 'newConnection';
 
 export const CAMERA_GUTTER = 8;
-
+export const MAP_HEIGHT = 2000;
+export const MAP_WIDTH = 4000;
 export const MAX_SPEED = 100;
 
 export const PLANT_TYPE = 'plant';
