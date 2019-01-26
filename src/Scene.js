@@ -2,7 +2,6 @@ import 'phaser';
 import conn from './conn';
 import { MSG_TYPE_PLAYER_MOVE } from './constants';
 
-
 export default class Scene extends Phaser.Scene {
     preload() {
         this.load.image('arrow', 'assets/arrow.png');

@@ -1,9 +1,12 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, CAMERA_GUTTER, MAX_SPEED } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED } from './constants';
 
+let currentPlayer = 0;
 let numPlayers = 4;
 let cameras = [];
+let players = [];
+let connectionIds = {};
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -12,11 +15,11 @@ export default class Scene extends Phaser.Scene {
     }
 
     create() {
+        // Camera and World creation
         let height = this.game.config.height / 2;
         let width = this.game.config.width / 2;
 
-        this.add.tileSprite(0, 0, width * 2, height * 2, 'beach');
-
+        this.add.tileSprite(0, 0, width * 4, height * 4, 'beach'); //test code
         this.physics.world.setBounds(0, 0, width * 2, height * 2);
 
         this.cameras.main.setSize(width - CAMERA_GUTTER, height - CAMERA_GUTTER);
@@ -27,26 +30,47 @@ export default class Scene extends Phaser.Scene {
         cameras.push(this.cameras.add(0, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
         cameras.push(this.cameras.add(width + CAMERA_GUTTER, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
 
-        this.player = this.physics.add.sprite(100, 450, 'arrow');
-        this.player.setCollideWorldBounds(true);
-        
-        let player = this.player;
+        let cameraCenterX = width / 2;
+        let cameraCenterY = height / 2;
 
-        cameras.forEach(camera => {
-            camera.startFollow(player);
+        // Player creation
+        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY, 'arrow'));
+        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY, 'arrow'));
+        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'arrow'));
+        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY + height, 'arrow'));
+
+        players.forEach(player => {
+            player.setCollideWorldBounds(true);
+        });
+
+        cameras.forEach((camera, index) => {
+            camera.startFollow(players[index]);
             camera.setBounds(0, 0, width * 2, height * 2); 
         });
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-            let force = msg.joystick.force * MAX_SPEED;
-            let angle = msg.joystick.angle;
 
-            if (angle != 0) {
-                player.setAngle(angle);
-            }
-            player.setVelocityX(force * Math.cos(angle * Math.PI/180));
-            player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+
+            switch (msg.type) {
+                case MSG_TYPE_NEW_CONNECTION:
+                    if (currentPlayer < numPlayers) {
+                        connectionIds[msg.resourceId] = currentPlayer++;
+                    }
+                    break;
+                case MSG_TYPE_PLAYER_MOVE:
+                    let force = msg.joystick.force * MAX_SPEED;
+                    let angle = msg.joystick.angle;
+
+                    let player = players[connectionIds[msg.resourceId]];
+
+                    if (angle != 0) {
+                        player.setAngle(angle);
+                    }
+                    player.setVelocityX(force * Math.cos(angle * Math.PI/180));
+                    player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+                    break;
+            };
         };
     }
 
