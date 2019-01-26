@@ -1,7 +1,7 @@
 import 'phaser';
 import conn from './conn';
 import { 
-    MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED,
+    MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED, MSG_TYPE_PLAYER_ATTACK,
     LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART, 
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
     HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART, 
@@ -43,7 +43,7 @@ let FURNITURE_NAMES = [
     // HIGH_TV    , 
     // HIGH_ART     
 ];
-
+import Player from './classes/Player'
 let currentPlayer = 0;
 let numPlayers = 4;
 let cameras = [];
@@ -53,6 +53,11 @@ let items = null;
 
 export default class Scene extends Phaser.Scene {
     preload() {
+        this.load.spritesheet('crab1', 'assets/crabs/bluecrab/bluecrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab2', 'assets/crabs/greencrab/greencrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab3', 'assets/crabs/purplecrab/purplecrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab4', 'assets/crabs/yellowcrab/yellowcrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('map', 'assets/island.png')
 
@@ -71,10 +76,16 @@ export default class Scene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         // Player creation
-        players.push(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'arrow'));
-        players.push(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'arrow'));
-        players.push(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'arrow'));
-        players.push(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'arrow'));
+        players.push(this.physics.add.sprite( 'arrow'));
+        players.push(this.physics.add.sprite( 'arrow'));
+        players.push(this.physics.add.sprite( 'arrow'));
+        players.push(this.physics.add.sprite( 'arrow'));
+
+        // Player creation
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'),this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'crab2'),this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'),this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'crab4'),this));
 
         this.cameras.main.setSize(width - CAMERA_GUTTER, height - CAMERA_GUTTER);
         this.cameras.main.setPosition(0, 0);
@@ -98,18 +109,18 @@ export default class Scene extends Phaser.Scene {
         });
 
         players.forEach(player => {
-            player.setCollideWorldBounds(true);
+            player.sprite.setCollideWorldBounds(true);
         });
 
         cameras.forEach((camera, index) => {
-            camera.startFollow(players[index]);
+            camera.startFollow(players[index].sprite);
             camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT); 
         });
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
 
-   
+            var player = null;
             switch (msg.type) {
                 case MSG_TYPE_NEW_CONNECTION:
                     if (currentPlayer < numPlayers) {
@@ -120,11 +131,14 @@ export default class Scene extends Phaser.Scene {
                     let force = msg.joystick.force * MAX_SPEED;
                     let angle = msg.joystick.angle;
 
-                    let player = players[connectionIds[msg.resourceId]];
+                    player = players[connectionIds[msg.resourceId]];
 
-                    player.setAngle(angle);
-                    player.setVelocityX(force * Math.cos(angle * Math.PI/180));
-                    player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+                    player.move(angle,force)
+                    break;
+                case MSG_TYPE_PLAYER_ATTACK:
+                    player = players[connectionIds[msg.resourceId]];
+                    player.attack(players);
+                    
                     break;
             };
         };

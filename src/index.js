@@ -25,7 +25,10 @@ var config = {
     height: hei,
 
     physics: {
-        default: 'arcade'
+        default: 'arcade',
+        arcade:{
+            debug: true
+        }
     },
     plugins: {
         global: [{

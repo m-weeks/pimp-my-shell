@@ -1,6 +1,8 @@
 export const MSG_TYPE_PLAYER_MOVE = 'playerMove';
 export const MSG_TYPE_NEW_CONNECTION = 'newConnection';
 
+export const MSG_TYPE_PLAYER_ATTACK = 'playerAttack'
+
 export const CAMERA_GUTTER = 8;
 export const MAP_HEIGHT = 2000;
 export const MAP_WIDTH = 4000;
