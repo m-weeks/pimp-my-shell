@@ -1,4 +1,7 @@
 import 'phaser';
+import conn from './conn';
+import { MSG_TYPE_PLAYER_MOVE } from './constants';
+
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -9,8 +12,10 @@ export default class Scene extends Phaser.Scene {
         this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: 150, y: this.game.config.height - 150, radius: 100})
         this.joyStick.on('update', this.handleJoyStickState, this);
 
-        this.player = this.physics.add.sprite(100, 450, 'arrow');
-        this.player.setCollideWorldBounds(true);
+        conn.onmessage = function (msg) {
+            msg = JSON.parse(msg.data);
+            console.log(msg);
+        };
     }
 
     update() {
@@ -21,8 +26,14 @@ export default class Scene extends Phaser.Scene {
         let angle = this.joyStick.angle;
         let force = this.joyStick.force;
 
-        this.player.setAngle(angle);
-        this.player.setVelocityX(force * Math.cos(angle * Math.PI/180));
-        this.player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+        let msg = {
+            type: MSG_TYPE_PLAYER_MOVE,
+            joystick: {
+                angle: angle,
+                force: force
+            }
+        };
+
+        conn.send(JSON.stringify(msg));
     }
 }
