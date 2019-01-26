@@ -42,7 +42,9 @@ export default class Scene extends Phaser.Scene {
             let force = msg.joystick.force * MAX_SPEED;
             let angle = msg.joystick.angle;
 
-            player.setAngle(angle);
+            if (angle != 0) {
+                player.setAngle(angle);
+            }
             player.setVelocityX(force * Math.cos(angle * Math.PI/180));
             player.setVelocityY(force * Math.sin(angle * Math.PI/180));
         };

@@ -5,16 +5,26 @@ import { MSG_TYPE_PLAYER_MOVE } from './constants';
 
 export default class Scene extends Phaser.Scene {
     preload() {
-        this.load.image('arrow', 'assets/arrow.png')
+        this.load.image('arrow', 'assets/arrow.png');
+        this.load.image('button', 'assets/button.png');
     }
 
     create() {
-        this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: 150, y: this.game.config.height - 150, radius: 100})
+        let height = this.game.config.height;
+        let width = this.game.config.width;
+        this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: 150, y: height - 150, radius: 100})
         this.joyStick.on('update', this.handleJoyStickState, this);
+
+        this.button = this.add.sprite(width - 150, height - 150, 'button').setInteractive();
+        this.button.on('pointerdown', function () {
+            this.setAlpha(0.5);
+        });
+        this.button.on('pointerup', function () {
+            this.setAlpha(1);
+        });
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-            console.log(msg);
         };
     }
 
@@ -27,7 +37,6 @@ export default class Scene extends Phaser.Scene {
         let force = this.joyStick.force;
         force = force > 100 ? 100 : force;
         force /= 100.0
-        console.log(force);
 
         let msg = {
             type: MSG_TYPE_PLAYER_MOVE,
