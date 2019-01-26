@@ -1,6 +1,6 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK } from './constants';
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -15,9 +15,16 @@ export default class Scene extends Phaser.Scene {
         this.joyStick.on('update', this.handleJoyStickState, this);
 
         this.button = this.add.sprite(width - 150, height - 150, 'button').setInteractive();
+
         this.button.on('pointerdown', function () {
             this.setAlpha(0.5);
+            let msg = {
+                type: MSG_TYPE_PLAYER_ATTACK,
+                attack: true
+            };
+            conn.send(JSON.stringify(msg));
         });
+
         this.button.on('pointerup', function () {
             this.setAlpha(1);
         });

@@ -1,6 +1,7 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED, MSG_TYPE_PLAYER_ATTACK } from './constants';
+import Player from './classes/Player'
 
 let currentPlayer = 0;
 let numPlayers = 4;
@@ -10,7 +11,12 @@ let connectionIds = {};
 
 export default class Scene extends Phaser.Scene {
     preload() {
-        this.load.image('arrow', 'assets/arrow.png');
+        this.load.spritesheet('crab1', 'assets/crabs/bluecrab/bluecrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab2', 'assets/crabs/greencrab/greencrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab3', 'assets/crabs/purplecrab/purplecrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+        this.load.spritesheet('crab4', 'assets/crabs/yellowcrab/yellowcrabspritesheet.png', { frameWidth: 403, frameHeight: 320 });
+
+
         this.load.image('beach', 'assets/beach.jpeg');
     }
 
@@ -34,24 +40,24 @@ export default class Scene extends Phaser.Scene {
         let cameraCenterY = height / 2;
 
         // Player creation
-        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'arrow'));
-        players.push(this.physics.add.sprite(cameraCenterX + width, cameraCenterY + height, 'arrow'));
+        players.push(new Player(this.physics.add.sprite(cameraCenterX, cameraCenterY, 'crab1'),this));
+        players.push(new Player(this.physics.add.sprite(cameraCenterX + width, cameraCenterY, 'crab2'),this));
+        players.push(new Player(this.physics.add.sprite(cameraCenterX, cameraCenterY + height, 'crab3'),this));
+        players.push(new Player(this.physics.add.sprite(cameraCenterX + width, cameraCenterY + height, 'crab4'),this));
 
         players.forEach(player => {
-            player.setCollideWorldBounds(true);
+            player.sprite.setCollideWorldBounds(true);
         });
 
         cameras.forEach((camera, index) => {
-            camera.startFollow(players[index]);
+            camera.startFollow(players[index].sprite);
             camera.setBounds(0, 0, width * 2, height * 2); 
         });
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
 
-
+            var player = null;
             switch (msg.type) {
                 case MSG_TYPE_NEW_CONNECTION:
                     if (currentPlayer < numPlayers) {
@@ -62,13 +68,14 @@ export default class Scene extends Phaser.Scene {
                     let force = msg.joystick.force * MAX_SPEED;
                     let angle = msg.joystick.angle;
 
-                    let player = players[connectionIds[msg.resourceId]];
+                    player = players[connectionIds[msg.resourceId]];
 
-                    if (angle != 0) {
-                        player.setAngle(angle);
-                    }
-                    player.setVelocityX(force * Math.cos(angle * Math.PI/180));
-                    player.setVelocityY(force * Math.sin(angle * Math.PI/180));
+                    player.move(angle,force)
+                    break;
+                case MSG_TYPE_PLAYER_ATTACK:
+                    player = players[connectionIds[msg.resourceId]];
+                    player.attack(players);
+                    
                     break;
             };
         };
