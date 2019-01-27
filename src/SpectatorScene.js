@@ -18,30 +18,9 @@ import Art from './classes/Art';
 import { LOW_FANCINESS, HIGH_FANCINESS, MID_FANCINESS } from './classes/Furniture';
 
 let FURNITURE_NAMES = [
-    LOW_PLANT,
-    LOW_LAMP, 
-    LOW_RUG    , 
-    LOW_BOOKSHELF, 
-    LOW_COUCH  , 
-    // LOW_ANTENNA, 
-    LOW_TV     , 
-    LOW_ART    , 
-    MID_PLANT,
-    // MID_LAMP   , 
-    MID_RUG    , 
-    // MID_BOOKSHELF, 
-    // MID_COUCH  , 
-    // MID_ANTENNA, 
-    MID_TV     , 
-    // MID_ART    , 
-    HIGH_PLANT,
-    // HIGH_LAMP  , 
-    // HIGH_RUG   , 
-    // HIGH_BOOKSHELF, 
-    HIGH_COUCH , 
-    // HIGH_ANTENNA, 
-    // HIGH_TV    , 
-    // HIGH_ART     
+    LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
+    MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
+    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART
 ];
 import Player from './classes/Player'
 let connectionIds;

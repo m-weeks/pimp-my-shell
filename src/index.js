@@ -4,7 +4,7 @@ import SpectatorScene from './SpectatorScene';
 import VirtualJoyStickPlugin  from './plugins/rexvirtualjoystickplugin.min';
 import { MAP_WIDTH, MAP_HEIGHT, MSG_TYPE_NEW_CONNECTION, MSG_TYPE_NEW_PLAYER, GAME_LENGTH_SECS } from './constants';
 import conn from './conn';
-import { ENGINE_METHOD_PKEY_ASN1_METHS } from 'constants';
+
 let scene;
 let currentSecs = GAME_LENGTH_SECS;
 let wid;
