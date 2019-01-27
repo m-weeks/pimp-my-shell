@@ -11,10 +11,10 @@ export default class Scene extends Phaser.Scene {
     create() {
         let height = this.game.config.height;
         let width = this.game.config.width;
-        this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: 150, y: height - 150, radius: 100})
+        this.joyStick = this.plugins.get('rexVirtualJoyStick').add(this, {x: width / 4, y: height / 2, radius: 100})
         this.joyStick.on('update', this.handleJoyStickState, this);
 
-        this.button = this.add.sprite(width - 150, height - 150, 'button').setInteractive();
+        this.button = this.add.sprite(width - (width / 4), height /2, 'button').setInteractive().setScale(0.5, 0.5);
 
         this.button.on('pointerdown', function () {
             this.setAlpha(0.5);
@@ -23,10 +23,12 @@ export default class Scene extends Phaser.Scene {
                 attack: true
             };
             conn.send(JSON.stringify(msg));
-        });
 
-        this.button.on('pointerup', function () {
-            this.setAlpha(1);
+            let button = this;
+
+            setTimeout(() => {
+                button.setAlpha(1);
+            }, 200);
         });
 
         conn.onmessage = function (msg) {
@@ -35,7 +37,7 @@ export default class Scene extends Phaser.Scene {
     }
 
     update() {
-
+    
     }
 
     handleJoyStickState() {
