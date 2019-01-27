@@ -1,6 +1,6 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_UPDATED_INVENTORY, MSG_TYPE_YOUR_ID, MSG_TYPE_END_GAME, MSG_TYPE_PLAYER_POWER } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_UPDATED_INVENTORY, MSG_TYPE_YOUR_ID, MSG_TYPE_END_GAME, MSG_TYPE_PLAYER_POWER, POWER_TYPE_SPEED } from './constants';
 
 let myId = null;
 
@@ -40,7 +40,7 @@ export default class Scene extends Phaser.Scene {
             this.setAlpha(0.5);
             let msg = {
                 type: MSG_TYPE_PLAYER_POWER,
-                power: POWER_TYPE_SPEED,
+                power: POWER_TYPE_SPEED
             }
 
             conn.send(JSON.stringify(msg));
