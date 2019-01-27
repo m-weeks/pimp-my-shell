@@ -178,7 +178,6 @@ export default class Scene extends Phaser.Scene {
             }
 
             var type = Math.random() * 100;
-            console.log(type);
             var item;
 
             switch(true){
