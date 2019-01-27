@@ -31,8 +31,13 @@ export default class Player {
             frames: scene.anims.generateFrameNumbers(this.key, { start: 0, end: 1 }),
             frameRate: 6,
             duration: 500,
-            repeat: 0
+            repeat: 0            
         });
+        this.sprite.on('animationcomplete', function(animation) {
+            if (animation == this.attackanim) {
+                this.attacking = false;
+            }
+        }, this);
         
         this.sprite.anims.play('still-' + this.key);
 
@@ -55,13 +60,15 @@ export default class Player {
         this.sprite.anims.play('attack-' + this.key);
         this.snip.play();
         attackHitbox.body.moves = false;
+        this.attacking = true;
 
         players.forEach(curplayer => {
             if(curplayer != this){
-                this.scene.physics.add.collider(attackHitbox, curplayer.sprite, function(){
+                this.scene.physics.add.overlap(attackHitbox, curplayer.sprite, function(){
                     if (!curplayer.invincible) {
                         curplayer.invincible = true;
                         curplayer.sprite.setAlpha(0.5);
+                        curplayer.knockBack(this.sprite.angle);
                         let item = curplayer.pickRandomItem();
                         if(item != null) {
                             this.scene.throwItem(item, curplayer);
@@ -77,13 +84,27 @@ export default class Player {
         });
         setTimeout(() => {
             attackHitbox.destroy();
-        }, 200);
+        }, 100);
+    }
 
+    knockBack(angle) {
+        angle = this.toRad(angle);
+        let x = this.sprite.x + Math.cos(angle) * 150;
+        let y = this.sprite.y + Math.sin(angle) * 150;
+        this.scene.tweens.add({
+            targets: this.sprite, 
+            duration: 750,
+            ease: 'Quart.easeOut',
+            x: x,
+            y: y
+        });
     }
 
     move(angle,force){
         if (force != 0){
-            this.sprite.anims.play('walk-' + this.key, true);
+            if(!this.attacking) {
+                this.sprite.anims.play('walk-' + this.key, true);
+            }
         }else{
             this.sprite.anims.play('still-' + this.key);
         }
@@ -154,5 +175,4 @@ export default class Player {
             }
         }
     }
-
 } 

@@ -251,6 +251,7 @@ export default class Scene extends Phaser.Scene {
             duration: 500,
             x: x,
             y: y,
+            ease: 'Quart.easeOut',
             onComplete: function() {
                 player.thud.play();
                 item.body.enable = true;

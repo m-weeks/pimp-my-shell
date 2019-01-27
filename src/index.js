@@ -31,9 +31,8 @@ var config = {
     type: Phaser.AUTO,
     width: wid,
     height: hei,
-
     physics: {
-        default: 'arcade',
+        default: 'arcade'
     },
     input: {
         activePointers: 3
