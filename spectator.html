@@ -33,17 +33,29 @@
 
 
         <div id="score0" class="scorebox" style="position: fixed; top: 0; left: 0">
-            0
+            <span id="scorename0">t</span>
+            <span id="scorenumber0">0</span>
         </div>
         <div id="score1" class="scorebox right" style="position: fixed; top: 0; right: 0">
-            0
+                <span id="scorename1">e</span>
+                <span id="scorenumber1">0</span>
         </div>
+
+        <div id="timer" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(255,255,255,0.3); border-radius: 25px; border: 3px solid black; text-align: center; padding: 15px;">4:11</div>
+
         <div id="score2" class="scorebox" style="position: fixed; bottom: 0; left: 0">
-            0
+                <span id="scorename2">s</span>
+                <span id="scorenumber2">0</span>
         </div>
         <div id="score3" class="scorebox right" style="position: fixed; bottom: 0; right: 0">
-            0
+                <span id="scorename3">t</span>
+                <span id="scorenumber3">0</span>
         </div>
+    </div>
+
+    <div id="endgame" style="flex-direction: column; justify-content: center; align-items: center;">
+        <span id="winner"></span>
+        <span id="winscore"></span>
     </div>
 
     <style>
@@ -56,6 +68,8 @@
             margin: 10px;
             opacity: 0.7;
             min-width: 100px;
+            display: flex;
+            flex-direction: column;
         }
 
         .right {
@@ -63,6 +77,10 @@
         }
 
         #scores {
+            display: none;
+        }
+
+        #endgame {
             display: none;
         }
 

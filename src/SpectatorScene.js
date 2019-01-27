@@ -1,11 +1,11 @@
 import 'phaser';
 import conn from './conn';
-import { 
+import {
     MSG_TYPE_PLAYER_MOVE, MSG_TYPE_NEW_CONNECTION, CAMERA_GUTTER, MAX_SPEED, MSG_TYPE_PLAYER_ATTACK,
-    LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART, 
+    LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
-    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART, 
-    MAP_HEIGHT, MAP_WIDTH
+    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART,
+    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION
 } from './constants';
 import Plant from './classes/Plant';
 import Lamp from './classes/Lamp';
@@ -18,7 +18,7 @@ import Art from './classes/Art';
 import { LOW_FANCINESS, HIGH_FANCINESS, MID_FANCINESS } from './classes/Furniture';
 
 let FURNITURE_NAMES = [
-    LOW_PLANT, 
+    LOW_PLANT,
     // LOW_LAMP, 
     // LOW_RUG    , 
     // LOW_BOOKSHELF, 
@@ -26,7 +26,7 @@ let FURNITURE_NAMES = [
     // LOW_ANTENNA, 
     // LOW_TV     , 
     // LOW_ART    , 
-    MID_PLANT  , 
+    MID_PLANT,
     // MID_LAMP   , 
     // MID_RUG    , 
     // MID_BOOKSHELF, 
@@ -34,7 +34,7 @@ let FURNITURE_NAMES = [
     // MID_ANTENNA, 
     // MID_TV     , 
     // MID_ART    , 
-    HIGH_PLANT , 
+    HIGH_PLANT,
     // HIGH_LAMP  , 
     // HIGH_RUG   , 
     // HIGH_BOOKSHELF, 
@@ -72,7 +72,7 @@ export default class Scene extends Phaser.Scene {
         // Load furniture images
         FURNITURE_NAMES.forEach(name => {
             this.load.image(name, `assets/${name}.png`);
-        }); 
+        });
     }
 
     create() {
@@ -84,15 +84,15 @@ export default class Scene extends Phaser.Scene {
         // Camera and World creation
         let height = window.innerHeight / 2;
         let width = window.innerWidth / 2;
-        
+
         this.add.image(0, 0, 'map').setOrigin(0, 0);
         this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         // Player creation
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'),this));
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'crab2'),this));
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'),this));
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'crab4'),this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'), this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'crab2'), this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'), this));
+        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'crab4'), this));
 
         this.cameras.main.setSize(width - CAMERA_GUTTER, height - CAMERA_GUTTER);
         this.cameras.main.setPosition(0, 0);
@@ -121,16 +121,16 @@ export default class Scene extends Phaser.Scene {
 
         cameras.forEach((camera, index) => {
             camera.startFollow(players[index].sprite);
-            camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT); 
+            camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
         });
 
-        
 
-        
+
+
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-            
+
             var player = null;
             switch (msg.type) {
                 case MSG_TYPE_NEW_CONNECTION:
@@ -139,17 +139,30 @@ export default class Scene extends Phaser.Scene {
                     }
                     break;
                 case MSG_TYPE_PLAYER_MOVE:
-                    let force = msg.joystick.force * MAX_SPEED;
-                    let angle = msg.joystick.angle;
+                    
+                        let force = msg.joystick.force * MAX_SPEED;
+                        let angle = msg.joystick.angle;
 
-                    player = players[connectionIds[msg.resourceId]];
+                        player = players[connectionIds[msg.resourceId]];
+                        if (player){
+                            player.move(angle, force)
+                        }    
+                        
+                   
 
-                    player.move(angle,force)
                     break;
                 case MSG_TYPE_PLAYER_ATTACK:
-                    player = players[connectionIds[msg.resourceId]];
-                    player.attack(players);
                     
+                        player = players[connectionIds[msg.resourceId]];
+                        if (player){
+                        player.attack(players);
+                        }
+                    
+                    break;
+                case MSG_TYPE_CLOSE_CONNECTION:
+                    if (connectionIds[msg.resourceId]) {
+                        delete connectionIds[msg.resourceId];
+                    }
                     break;
             };
         };
@@ -159,7 +172,7 @@ export default class Scene extends Phaser.Scene {
     }
 
     update() {
-    
+
     }
 }
 
@@ -178,15 +191,15 @@ function itemCollision(player, item) {
     console.log(removedItem);
     if (removedItem == item) {
         removeItem(item);
-    }else if (removedItem && removedItem != item) {
+    } else if (removedItem && removedItem != item) {
         removeItem(item)
         //put removed item in scene behind player
         console.log("put item behind player");
     }
-    
+
     updateScores();
 
-    
+
 }
 
 
@@ -196,7 +209,7 @@ function removeItem(item) {
 
 function updateScores() {
     console.log(players[0].getScore());
-    players.forEach( (player, index) => {
-        document.getElementById("score" + index).innerHTML = player.getScore();
+    players.forEach((player, index) => {
+        document.getElementById("scorenumber" + index).innerHTML = player.getScore();
     });
 }
