@@ -5,7 +5,7 @@ import {
     LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
     HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART,
-    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION
+    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION, MAX_TICK
 } from './constants';
 import Plant from './classes/Plant';
 import Lamp from './classes/Lamp';
@@ -19,26 +19,26 @@ import { LOW_FANCINESS, HIGH_FANCINESS, MID_FANCINESS } from './classes/Furnitur
 
 let FURNITURE_NAMES = [
     LOW_PLANT,
-    // LOW_LAMP, 
-    // LOW_RUG    , 
-    // LOW_BOOKSHELF, 
-    // LOW_COUCH  , 
+    LOW_LAMP, 
+    LOW_RUG    , 
+    LOW_BOOKSHELF, 
+    LOW_COUCH  , 
     // LOW_ANTENNA, 
-    // LOW_TV     , 
-    // LOW_ART    , 
+    LOW_TV     , 
+    LOW_ART    , 
     MID_PLANT,
     // MID_LAMP   , 
-    // MID_RUG    , 
+    MID_RUG    , 
     // MID_BOOKSHELF, 
     // MID_COUCH  , 
     // MID_ANTENNA, 
-    // MID_TV     , 
+    MID_TV     , 
     // MID_ART    , 
     HIGH_PLANT,
     // HIGH_LAMP  , 
     // HIGH_RUG   , 
     // HIGH_BOOKSHELF, 
-    // HIGH_COUCH , 
+    HIGH_COUCH , 
     // HIGH_ANTENNA, 
     // HIGH_TV    , 
     // HIGH_ART     
@@ -48,7 +48,7 @@ let connectionIds;
 let numPlayers;
 let currentPlayer;
 
-
+let currentTick = 0;
 
 let cameras = [];
 let players = [];
@@ -107,15 +107,20 @@ export default class Scene extends Phaser.Scene {
 
         items = this.physics.add.group();
 
-        createItem(this, new Plant(LOW_FANCINESS), cameraCenterX + 100 + width, cameraCenterY);
-        createItem(this, new Plant(MID_FANCINESS), cameraCenterX + 200 + width, cameraCenterY);
-        createItem(this, new Plant(HIGH_FANCINESS), cameraCenterX + 100 + width, 200 + cameraCenterY);
+
+        this.spawnItems(10);
+
+
+
+
+
 
         players.forEach(player => {
             this.physics.add.overlap(player.sprite, items, function (sprite, item) { itemCollision(player, item); });
         });
 
         players.forEach(player => {
+            player.sprite.setDepth(9);
             player.sprite.setCollideWorldBounds(true);
         });
 
@@ -139,25 +144,25 @@ export default class Scene extends Phaser.Scene {
                     }
                     break;
                 case MSG_TYPE_PLAYER_MOVE:
-                    
-                        let force = msg.joystick.force * MAX_SPEED;
-                        let angle = msg.joystick.angle;
 
-                        player = players[connectionIds[msg.resourceId]];
-                        if (player){
-                            player.move(angle, force)
-                        }    
-                        
-                   
+                    let force = msg.joystick.force * MAX_SPEED;
+                    let angle = msg.joystick.angle;
+
+                    player = players[connectionIds[msg.resourceId]];
+                    if (player) {
+                        player.move(angle, force)
+                    }
+
+
 
                     break;
                 case MSG_TYPE_PLAYER_ATTACK:
-                    
-                        player = players[connectionIds[msg.resourceId]];
-                        if (player){
+
+                    player = players[connectionIds[msg.resourceId]];
+                    if (player) {
                         player.attack(players);
-                        }
-                    
+                    }
+
                     break;
                 case MSG_TYPE_CLOSE_CONNECTION:
                     if (connectionIds[msg.resourceId]) {
@@ -172,7 +177,57 @@ export default class Scene extends Phaser.Scene {
     }
 
     update() {
+        currentTick++;
+        if (currentTick >= MAX_TICK) {
+            currentTick = 0;
+            this.spawnItems(1);
+        }
+    }
 
+    spawnItems(num) {
+        for (var i = 0; i < num; i++) {
+            var fanciness = Math.random() * 10;
+            var fancyLevel;
+            if (fanciness > 8.5){
+                fancyLevel = HIGH_FANCINESS;
+            }else if (fanciness > 5) {
+                fancyLevel = MID_FANCINESS;
+            }else {
+                fancyLevel = LOW_FANCINESS;
+            }
+
+            var type = Math.random() * 100;
+            console.log(type);
+            var item;
+
+            switch(true){
+                case (type > 95):
+                    item = new Art(fancyLevel);
+                    break;
+                case (type > 86):
+                    item = new Tv(fancyLevel);
+                    break;
+                case (type > 76):
+                    item = new Antenna(fancyLevel);
+                    break;
+                case (type > 63):
+                    item = new Couch(fancyLevel);
+                    break;
+                case (type > 49):
+                    item = new Bookshelf(fancyLevel);
+                    break;
+                case (type > 34):
+                    item = new Rug(fancyLevel);
+                    break;
+                case (type > 19):
+                    item = new Lamp(fancyLevel);
+                    break;
+                default:
+                    item = new Plant(fancyLevel);
+            }
+
+            createItem(this, item, (Math.random() * (MAP_WIDTH - 300)) + 150, (Math.random() * (MAP_HEIGHT - 300)) + 150);
+        }
     }
 }
 
@@ -181,6 +236,13 @@ function createItem(scene, furniture, x, y) {
     let item = scene.physics.add.sprite(x, y, furniture.image);
     item.item = furniture;
     items.add(item);
+    item.setDisplaySize(100, 100);
+
+    item.body.setSize(100, 100);
+    item.body.setOffset(250,250);
+    
+    item.setDepth(1);
+  
 }
 
 function itemCollision(player, item) {
@@ -213,3 +275,4 @@ function updateScores() {
         document.getElementById("scorenumber" + index).innerHTML = player.getScore();
     });
 }
+
