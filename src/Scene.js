@@ -75,6 +75,22 @@ export default class Scene extends Phaser.Scene {
         };
         
         conn.send(JSON.stringify({type: MSG_TYPE_YOUR_ID}));
+
+        let scene = this;
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            console.log(scene);
+            scene.game.resize(width, height);
+            scene.physics.world.setBounds(0,0,width,height);
+            scene.cameras.main.setViewport(0,0,width,height);
+            scene.joyStick.setPosition(width / 4, height * (2/3.0));
+            scene.joyStick.update();
+            scene.snip.x = width - (width / 5);
+            scene.snip.y = height * (2/3.0);
+            scene.powerup.x = width - (width / 3);
+            scene.powerup.y = height / 3;
+        });
     }
 
     update() {
