@@ -5,7 +5,7 @@ import {
     LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
     HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART,
-    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION, MAX_TICK
+    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION, MAX_TICK, MSG_TYPE_PLAYER_POWER
 } from './constants';
 import Plant from './classes/Plant';
 import Lamp from './classes/Lamp';
@@ -54,6 +54,7 @@ let cameras = [];
 let players = [];
 
 let items = null;
+let powerups = null;
 let scoreboxes = [];
 
 export default class Scene extends Phaser.Scene {
@@ -70,6 +71,13 @@ export default class Scene extends Phaser.Scene {
         this.load.audio('snip', ['assets/audio/snip.wav']);
         this.load.audio('pop', ['assets/audio/pop.mp3']);
         this.load.audio('thud', ['assets/audio/thud.wav']);
+        this.load.audio('rocket', ['assets/audio/rocket.wav']);
+
+        //particles
+        this.load.image('cloud','assets/cloud.png');
+
+        //Other
+        this.load.image('rocket', 'assets/rocket.png');
 
         // Load furniture images
         FURNITURE_NAMES.forEach(name => {
@@ -108,17 +116,15 @@ export default class Scene extends Phaser.Scene {
         let cameraCenterY = height / 2;
 
         items = this.physics.add.group();
+        powerups = this.physics.add.group();
 
 
         this.spawnItems(10);
 
 
-
-
-
-
         players.forEach(player => {
             this.physics.add.overlap(player.sprite, items, function (sprite, item) { this.itemCollision(player, item); }, undefined, this);
+            this.physics.add.overlap(player.sprite, powerups, function (sprite, item) { player.addToPowerups(item); }, undefined, this);
         });
 
         players.forEach(player => {
@@ -155,17 +161,19 @@ export default class Scene extends Phaser.Scene {
                         player.move(angle, force)
                     }
 
-
-
                     break;
                 case MSG_TYPE_PLAYER_ATTACK:
-
                     player = players[connectionIds[msg.resourceId]];
                     if (player) {
                         player.attack(players);
                     }
 
                     break;
+                case MSG_TYPE_PLAYER_POWER:
+                    player = players[connectionIds[msg.resourceId]];
+                    if (player) {
+                        player.usePower(msg.power, players);
+                    }
                 case MSG_TYPE_CLOSE_CONNECTION:
                     if (connectionIds[msg.resourceId]) {
                         delete connectionIds[msg.resourceId];
@@ -229,6 +237,19 @@ export default class Scene extends Phaser.Scene {
             }
 
             createItem(this, item, (Math.random() * (MAP_WIDTH - 300)) + 150, (Math.random() * (MAP_HEIGHT - 300)) + 150);
+
+            if(type > 50) {
+                // Spawn in rocket
+                let x = (Math.random() * (MAP_WIDTH - 300)) + 150;
+                let y = (Math.random() * (MAP_HEIGHT - 300)) + 150;
+                let item = this.physics.add.sprite(x, y, 'rocket');
+                item.type = 'rocket';
+                powerups.add(item);
+                item.setDisplaySize(100, 100);
+                item.body.setSize(100, 100);
+                item.body.setOffset(250,250);
+                item.setDepth(1);
+            }
         }
     }
 

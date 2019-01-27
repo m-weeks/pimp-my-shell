@@ -1,3 +1,5 @@
+import { POWER_TYPE_SPEED } from "../constants";
+
 export default class Player {
     constructor(sprite, scene){
         this.sprite = sprite;
@@ -10,6 +12,7 @@ export default class Player {
         this.snip = scene.sound.add('snip');
         this.pop = scene.sound.add('pop');
         this.thud = scene.sound.add('thud');
+        this.rocket = scene.sound.add('rocket');
 
         this.walkanim = scene.anims.create({
             key: 'walk-' + this.key,
@@ -51,7 +54,19 @@ export default class Player {
             tv: null,
             art: null
         };
-       
+
+        this.powerUps = {
+            rocket: null
+        };
+
+        this.dustEmitter = this.scene.add.particles('cloud').createEmitter({
+            scale: { start: 1, end: 0 },
+            speed: 100,
+            quantity: 1,
+            lifeSpan: 400,
+            follow: this.sprite,
+            on: false
+        });
     }
 
     attack(players){
@@ -65,26 +80,30 @@ export default class Player {
         players.forEach(curplayer => {
             if(curplayer != this){
                 this.scene.physics.add.overlap(attackHitbox, curplayer.sprite, function(){
-                    if (!curplayer.invincible) {
-                        curplayer.invincible = true;
-                        curplayer.sprite.setAlpha(0.5);
-                        curplayer.knockBack(this.sprite.angle);
-                        let item = curplayer.pickRandomItem();
-                        if(item != null) {
-                            this.scene.throwItem(item, curplayer);
-                            curplayer.removeItem(item);
-                        }
-                        setTimeout(() => {
-                            curplayer.invincible = false;
-                            curplayer.sprite.setAlpha(1);
-                        }, 2000);
-                    }
+                    curplayer.hit(this);
                 }, undefined, this);
             }
         });
         setTimeout(() => {
             attackHitbox.destroy();
         }, 100);
+    }
+
+    hit(hitter) {
+        if (!this.invincible) {
+            this.invincible = true;
+            this.sprite.setAlpha(0.5);
+            this.knockBack(hitter.sprite.angle);
+            let item = this.pickRandomItem();
+            if(item != null) {
+                this.scene.throwItem(item, this);
+                this.removeItem(item);
+            }
+            setTimeout(() => {
+                this.invincible = false;
+                this.sprite.setAlpha(1);
+            }, 2000);
+        }
     }
 
     knockBack(angle) {
@@ -101,6 +120,10 @@ export default class Player {
     }
 
     move(angle,force){
+        if (angle != 0) {
+            this.sprite.setAngle(angle);
+        }
+
         if (force != 0){
             if(!this.attacking) {
                 this.sprite.anims.play('walk-' + this.key, true);
@@ -108,12 +131,15 @@ export default class Player {
         }else{
             this.sprite.anims.play('still-' + this.key);
         }
-
-        if (angle != 0) {
-            this.sprite.setAngle(angle);
+    
+        if(this.speedBoost) {
+            this.sprite.setVelocityX(this.speedBoost * Math.cos(this.toRad(this.sprite.angle)));
+            this.sprite.setVelocityY(this.speedBoost * Math.sin(this.toRad(this.sprite.angle)));
         }
-        this.sprite.setVelocityX(force * Math.cos(angle * Math.PI/180));
-        this.sprite.setVelocityY(force * Math.sin(angle * Math.PI/180));
+        else {
+            this.sprite.setVelocityX(force * Math.cos(this.toRad(this.sprite.angle)));
+            this.sprite.setVelocityY(force * Math.sin(this.toRad(this.sprite.angle)));
+        }
     }
 
     toRad(degrees){
@@ -140,6 +166,13 @@ export default class Player {
         }
         //Don't do anything
         return null;
+    }
+
+    addToPowerups(item) {
+        if(!this.powerUps[item.type]) {
+            this.powerUps[item.type] = true;
+            item.destroy();
+        }
     }
 
     findFurnitureByType(type) {
@@ -174,5 +207,45 @@ export default class Player {
                 this.furnitureInventory[prop] = null;
             }
         }
+    }
+
+    usePower(power, players) {
+        switch (power) {
+            case POWER_TYPE_SPEED:
+                if (this.powerUps['rocket']) {
+                    this.applySpeedBoost(players);
+                    this.powerUps['rocket'] = null;
+                }
+                break;
+        }
+    }
+
+    applySpeedBoost(players){
+        this.speedBoost = 500;
+        this.dustEmitter.setAngle({ min: this.sprite.angle - 225, max: this.sprite.angle + 225 });
+        this.dustEmitter.start();
+        this.rocket.play();
+        this.move(this.sprite.angle, this.speedBoost);
+        let player = this;
+        let overlaps = [];
+        players.forEach(curplayer => {
+            if(curplayer != this){
+                let overlap = this.scene.physics.add.overlap(this.sprite, curplayer.sprite, function(){
+                    curplayer.hit(this);
+                }, undefined, this);
+                overlaps.push(overlap);
+            }
+        });
+        setTimeout(function() {
+            player.speedBoost = undefined;
+            player.dustEmitter.stop();
+            player.sprite.setVelocityX(0);
+            player.sprite.setVelocityY(0);
+            player.rocket.stop();
+            overlaps.forEach(function(overlap) {
+                overlap.destroy();
+            });
+        }, 3000);
+
     }
 } 
