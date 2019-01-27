@@ -1,5 +1,6 @@
 export const MSG_TYPE_PLAYER_MOVE = 'playerMove';
 export const MSG_TYPE_NEW_CONNECTION = 'newConnection';
+export const MSG_TYPE_PLAYER_POWER = 'playerPower';
 export const MSG_TYPE_CLOSE_CONNECTION = 'closeConnection';
 export const MSG_TYPE_NEW_PLAYER = 'newPlayer';
 export const MSG_TYPE_UPDATED_INVENTORY = 'updatedInventory';
@@ -7,6 +8,8 @@ export const MSG_TYPE_YOUR_ID = 'yourId';
 export const MSG_TYPE_END_GAME = 'endGame';
 
 export const GAME_LENGTH_SECS = 0 + (1 * 60);
+
+export const POWER_TYPE_SPEED = 'speed';
 
 export const MAX_TICK = 200;
 
