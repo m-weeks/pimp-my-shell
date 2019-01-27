@@ -1,6 +1,6 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_UPDATED_INVENTORY, MSG_TYPE_YOUR_ID, MSG_TYPE_END_GAME, MSG_TYPE_PLAYER_POWER } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_UPDATED_INVENTORY, MSG_TYPE_YOUR_ID, MSG_TYPE_END_GAME, MSG_TYPE_PLAYER_POWER, POWER_TYPE_SPEED } from './constants';
 
 let myId = null;
 
@@ -40,7 +40,7 @@ export default class Scene extends Phaser.Scene {
             this.setAlpha(0.5);
             let msg = {
                 type: MSG_TYPE_PLAYER_POWER,
-                power: POWER_TYPE_SPEED,
+                power: POWER_TYPE_SPEED
             }
 
             conn.send(JSON.stringify(msg));
@@ -75,6 +75,22 @@ export default class Scene extends Phaser.Scene {
         };
         
         conn.send(JSON.stringify({type: MSG_TYPE_YOUR_ID}));
+
+        let scene = this;
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            console.log(scene);
+            scene.game.resize(width, height);
+            scene.physics.world.setBounds(0,0,width,height);
+            scene.cameras.main.setViewport(0,0,width,height);
+            scene.joyStick.setPosition(width / 4, height * (2/3.0));
+            scene.joyStick.update();
+            scene.snip.x = width - (width / 5);
+            scene.snip.y = height * (2/3.0);
+            scene.powerup.x = width - (width / 3);
+            scene.powerup.y = height / 3;
+        });
     }
 
     update() {

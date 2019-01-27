@@ -141,7 +141,6 @@ export default class Scene extends Phaser.Scene {
                     }
                     break;
                 case MSG_TYPE_PLAYER_MOVE:
-
                     let force = msg.joystick.force * MAX_SPEED;
                     let angle = msg.joystick.angle;
 
@@ -149,14 +148,13 @@ export default class Scene extends Phaser.Scene {
                     if (player) {
                         player.move(angle, force)
                     }
-
                     break;
                 case MSG_TYPE_PLAYER_ATTACK:
                     player = players[connectionIds[msg.resourceId]];
                     if (player) {
                         player.attack(players);
                     }
-
+                    
                     break;
                 case MSG_TYPE_PLAYER_POWER:
                     player = players[connectionIds[msg.resourceId]];
@@ -165,7 +163,7 @@ export default class Scene extends Phaser.Scene {
                     }
                 case MSG_TYPE_CLOSE_CONNECTION:
                     if (connectionIds[msg.resourceId]) {
-                        delete connectionIds[msg.resourceId];
+                        //delete connectionIds[msg.resourceId];
                     }
                     break;
             };
@@ -301,17 +299,17 @@ function updateScores() {
     players.forEach((player, index) => {
         document.getElementById("scorenumber" + index).innerHTML = player.getScore();
     });
-    sendUpdatedInventory();
+    // sendUpdatedInventory();
 }
 
-function sendUpdatedInventory() {
-    for (var resourceId in connectionIds) {
-        var msg = {
-            type: MSG_TYPE_UPDATED_INVENTORY,
-            inventory: players[connectionIds[resourceId]].furnitureInventory,
-            playerId: resourceId
-        };
-        conn.send(JSON.stringify(msg));
-    };
-}
+// function sendUpdatedInventory() {
+//     for (var resourceId in connectionIds) {
+//         var msg = {
+//             type: MSG_TYPE_UPDATED_INVENTORY,
+//             inventory: players[connectionIds[resourceId]].furnitureInventory,
+//             playerId: resourceId
+//         };
+//         conn.send(JSON.stringify(msg));
+//     };
+// }
 

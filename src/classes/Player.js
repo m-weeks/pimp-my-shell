@@ -212,9 +212,9 @@ export default class Player {
     usePower(power, players) {
         switch (power) {
             case POWER_TYPE_SPEED:
-                if (this.powerUps['rocket']) {
+                if (this.powerUps.rocket) {
                     this.applySpeedBoost(players);
-                    this.powerUps['rocket'] = null;
+                    this.powerUps.rocket = null;
                 }
                 break;
         }

@@ -176,8 +176,8 @@ function endGame() {
 
     document.querySelector('.crab').src = crabImage;
 
-    document.querySelector('#audio source').src = 'assets/audio/victory.mp3';
-    document.querySelector('#audio').play();
+    let victory = new Audio('/assets/audio/victory.mp3');
+    victory.play();
 
     game.destroy(true);
 }
