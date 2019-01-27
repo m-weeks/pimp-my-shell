@@ -96,7 +96,7 @@ conn.onmessage = function (msg) {
                 document.querySelector("#name" + window.currentPlayerName).style.display = "flex";
                 document.getElementById("scorename" + window.currentPlayerName).innerHTML = msg.name;
                 document.getElementById("score" + window.currentPlayerName).style.display = "flex";
-                console.log(window.currentPlayerName);
+                
                 if ( window.currentPlayerName >= 1){
                     document.getElementById("startGame").style.display = "block";
                 }
