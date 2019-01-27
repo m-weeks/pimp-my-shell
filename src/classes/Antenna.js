@@ -3,7 +3,7 @@ import { ANTENNA_TYPE, LOW_ANTENNA, MID_ANTENNA, HIGH_ANTENNA } from '../constan
 
 export default class Antenna extends Furniture {
     constructor(fanciness) {
-        super(ANTENNA_TYPE, ANTENNA * fanciness * Furniture.getFudgeFactor());
+        super(ANTENNA_TYPE, ANTENNA * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_ANTENNA;

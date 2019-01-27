@@ -3,7 +3,7 @@ import { COUCH_TYPE, LOW_COUCH, MID_COUCH, HIGH_COUCH } from '../constants';
 
 export default class Couch extends Furniture {
     constructor(fanciness) {
-        super(COUCH_TYPE, COUCH * fanciness * Furniture.getFudgeFactor());
+        super(COUCH_TYPE, COUCH * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_COUCH;

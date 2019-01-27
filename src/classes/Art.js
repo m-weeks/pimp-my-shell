@@ -3,7 +3,7 @@ import { ART_TYPE, LOW_ART, MID_ART, HIGH_ART } from '../constants';
 
 export default class Art extends Furniture {
     constructor(fanciness) {
-        super(ART_TYPE, ART * fanciness * Furniture.getFudgeFactor());
+        super(ART_TYPE, ART * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_ART;

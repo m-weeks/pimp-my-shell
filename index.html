@@ -1,10 +1,27 @@
- <!DOCTYPE html>
- <html>
-     <head>
-         <meta charset="utf-8">
-     </head>
-     <body style="margin: 0;">
-         <script src="build/project.bundle.js" charset="utf-8"></script>
-  
-     </body>
- </html>
+<html>
+<head>
+    <title>Pimp My Shell</title>
+    
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; justify-content: center;align-items: center; height: 100%; width: 100%;">
+            <span>Enter your name</span>
+            <input type="text" id="name"/>
+            <button id="join">Join Game</button>
+    </div>
+<script>
+document.getElementById("join").onclick = function () 
+{
+    var name = document.getElementById("name").value;
+    var d = new Date();
+    d.setTime(d.getTime() + (1*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = "name=" + name + ";" + expires + "; path=/";
+
+    location.href="phone.html";
+    
+};
+
+</script>
+</body>
+</html>

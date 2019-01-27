@@ -3,7 +3,7 @@ import { TV_TYPE, LOW_TV, MID_TV, HIGH_TV } from '../constants';
 
 export default class Tv extends Furniture {
     constructor(fanciness) {
-        super(TV_TYPE, TV * fanciness * Furniture.getFudgeFactor());
+        super(TV_TYPE, TV * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_TV;

@@ -3,7 +3,7 @@ import { BOOKSHELF_TYPE, LOW_BOOKSHELF, MID_BOOKSHELF, HIGH_BOOKSHELF } from '..
 
 export default class Bookshelf extends Furniture {
     constructor(fanciness) {
-        super(BOOKSHELF_TYPE, BOOKSHELF * fanciness * Furniture.getFudgeFactor());
+        super(BOOKSHELF_TYPE, BOOKSHELF * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_BOOKSHELF;
