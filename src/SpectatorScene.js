@@ -70,7 +70,7 @@ export default class Scene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         // Player creation
-        console.log(currentPlayer);
+        
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'), this));
         cameras.push(this.cameras.main);
 
@@ -169,6 +169,8 @@ export default class Scene extends Phaser.Scene {
             currentTick = 0;
             this.spawnItems(1);
         }
+
+        window.playerArray = players;
     }
 
     spawnItems(num) {

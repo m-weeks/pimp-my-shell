@@ -2,7 +2,7 @@ import 'phaser';
 import Scene from './Scene';
 import SpectatorScene from './SpectatorScene';
 import VirtualJoyStickPlugin  from './plugins/rexvirtualjoystickplugin.min';
-import { MAP_WIDTH, MAP_HEIGHT, MSG_TYPE_NEW_CONNECTION, MSG_TYPE_NEW_PLAYER, GAME_LENGTH_SECS } from './constants';
+import { MAP_WIDTH, MAP_HEIGHT, MSG_TYPE_NEW_CONNECTION, MSG_TYPE_NEW_PLAYER, GAME_LENGTH_SECS, MSG_TYPE_END_GAME } from './constants';
 import conn from './conn';
 
 let scene;
@@ -14,6 +14,7 @@ window.numPlayers = 4;
 window.currentPlayer = 0;
 window.currentPlayerName = 0;
 window.playerNames = {};
+window.playerArray = [];
 
 if (window.spectator){
     scene = SpectatorScene;
@@ -129,7 +130,34 @@ function endGame() {
     }
     document.getElementById("winner").innerHTML = document.getElementById("scorename" + winner).innerHTML
     document.getElementById("winscore").innerHTML = highscore;
+    //TODO: Tell the phone it won
+    // var winnerResourceId;
+    // for (var id in game.scene.connectionIds){
+    //     console.log(game.scene.connectionIds[id]);
+    //     if (game.scene.connectionIds[id] == winner){
+    //         winnerResourceId = id;
+    //     }
+    // };
+    
+    // let msg = {
+    //     type: MSG_TYPE_END_GAME,
+    //     winnerId:  winnerResourceId
+    // };
+    // conn.send(JSON.stringify(msg));
 
+    
+
+    let inventory = window.playerArray[winner].furnitureInventory;
+
+    // TODO: Change to constants
+    let types = ['couch', 'plant', 'lamp', 'rug', 'tv', 'bookshelf', 'antenna', 'art'];
+
+    for(var i = 0; i < 8; i++) {
+        let item = inventory[types[i]];
+        if (item) {
+            document.querySelector('.'+types[i]).src = 'assets/' + item.item.image + '.png';
+        }
+    }
 
     game.destroy(true);
 }
