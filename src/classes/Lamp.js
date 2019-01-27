@@ -3,7 +3,7 @@ import { LAMP_TYPE, LOW_LAMP, MID_LAMP, HIGH_LAMP } from '../constants';
 
 export default class Lamp extends Furniture {
     constructor(fanciness) {
-        super(LAMP_TYPE, LAMP * fanciness * Furniture.getFudgeFactor());
+        super(LAMP_TYPE, LAMP * fanciness * Furniture.getFudgeFactor(), fanciness);
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_LAMP;

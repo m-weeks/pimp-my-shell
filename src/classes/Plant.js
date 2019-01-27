@@ -3,7 +3,8 @@ import { PLANT_TYPE, LOW_PLANT, MID_PLANT, HIGH_PLANT } from '../constants';
 
 export default class Plant extends Furniture {
     constructor(fanciness) {
-        super(PLANT_TYPE, PLANT * fanciness * Furniture.getFudgeFactor());
+        super(PLANT_TYPE, PLANT * fanciness * Furniture.getFudgeFactor(), fanciness);
+        
         switch (fanciness) {
             case LOW_FANCINESS: 
                 this.image = LOW_PLANT;

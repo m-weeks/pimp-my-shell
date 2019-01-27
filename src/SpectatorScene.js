@@ -44,12 +44,17 @@ let FURNITURE_NAMES = [
     // HIGH_ART     
 ];
 import Player from './classes/Player'
-let currentPlayer = 0;
-let numPlayers = 4;
+let connectionIds;
+let numPlayers;
+let currentPlayer;
+
+
+
 let cameras = [];
 let players = [];
-let connectionIds = {};
+
 let items = null;
+let scoreboxes = [];
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -71,6 +76,11 @@ export default class Scene extends Phaser.Scene {
     }
 
     create() {
+        connectionIds = window.connectionIds;
+        numPlayers = window.numPlayers;
+        currentPlayer = window.currentPlayer;
+
+
         // Camera and World creation
         let height = window.innerHeight / 2;
         let width = window.innerWidth / 2;
@@ -102,7 +112,7 @@ export default class Scene extends Phaser.Scene {
         createItem(this, new Plant(HIGH_FANCINESS), cameraCenterX + 100 + width, 200 + cameraCenterY);
 
         players.forEach(player => {
-            this.physics.add.overlap(player.sprite, items, itemCollision);
+            this.physics.add.overlap(player.sprite, items, function (sprite, item) { itemCollision(player, item); });
         });
 
         players.forEach(player => {
@@ -114,9 +124,13 @@ export default class Scene extends Phaser.Scene {
             camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT); 
         });
 
+        
+
+        
+
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
-
+            
             var player = null;
             switch (msg.type) {
                 case MSG_TYPE_NEW_CONNECTION:
@@ -145,7 +159,7 @@ export default class Scene extends Phaser.Scene {
     }
 
     update() {
-
+    
     }
 }
 
@@ -157,8 +171,32 @@ function createItem(scene, furniture, x, y) {
 }
 
 function itemCollision(player, item) {
-    console.log('collision')
-    items.killAndHide(item);
 
-    item.body.enable = false;
+
+    //check player inventory for items of this type
+    let removedItem = player.addToFurnitureInventory(item);
+    console.log(removedItem);
+    if (removedItem == item) {
+        removeItem(item);
+    }else if (removedItem && removedItem != item) {
+        removeItem(item)
+        //put removed item in scene behind player
+        console.log("put item behind player");
+    }
+    
+    updateScores();
+
+    
+}
+
+
+function removeItem(item) {
+    item.destroy();
+}
+
+function updateScores() {
+    console.log(players[0].getScore());
+    players.forEach( (player, index) => {
+        document.getElementById("score" + index).innerHTML = player.getScore();
+    });
 }

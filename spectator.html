@@ -1,11 +1,81 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script>window.spectator = true;</script>
-    </head>
-    <body style="margin: 0;">
-        <script src="build/project.bundle.js" charset="utf-8"></script>
- 
-    </body>
+
+<head>
+    <meta charset="utf-8">
+    <script>
+        window.connect = true;
+        window.spectator = true;
+        window.startGame = false;</script>
+</head>
+
+<body style="margin: 0;">
+    <script src="build/project.bundle.js" charset="utf-8"></script>
+    <div class="lobby">
+        <div class="player-name" id="name0">
+
+        </div>
+        <div class="player-name" id="name1">
+
+        </div>
+        <div class="player-name" id="name2">
+
+        </div>
+        <div class="player-name" id="name3">
+
+        </div>
+
+        <button id="startGame">Start Game</button>
+    </div>
+
+
+    <div id="scores">
+
+
+        <div id="score0" class="scorebox" style="position: fixed; top: 0; left: 0">
+            0
+        </div>
+        <div id="score1" class="scorebox right" style="position: fixed; top: 0; right: 0">
+            0
+        </div>
+        <div id="score2" class="scorebox" style="position: fixed; bottom: 0; left: 0">
+            0
+        </div>
+        <div id="score3" class="scorebox right" style="position: fixed; bottom: 0; right: 0">
+            0
+        </div>
+    </div>
+
+    <style>
+        .scorebox {
+            background-color: white;
+            border-radius: 25px;
+            font-size: 20px;
+            padding: 15px;
+            border: 2px solid black;
+            margin: 10px;
+            opacity: 0.7;
+            min-width: 100px;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        #scores {
+            display: none;
+        }
+
+        .lobby {
+
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</body>
+
 </html>

@@ -33,6 +33,18 @@ export default class Player {
         });
         
         this.sprite.anims.play('still-' + this.key);
+
+        this.furnitureInventory = {
+            plant: null,
+            lamp: null,
+            rug: null,
+            bookshelf: null,
+            couch: null,
+            antenna: null,
+            tv: null,
+            art: null
+        };
+       
     }
 
     attack(players){
@@ -80,4 +92,40 @@ export default class Player {
     toRad(degrees){
         return degrees * (Math.PI / 180);
     }
+
+    addToFurnitureInventory(item) {
+        //check if the item is better than the one in the inventory
+        var currentItem = this.findFurnitureByType(item.item.type);
+        
+        if (!currentItem) {
+            this.furnitureInventory[item.item.type] = item;
+            //Tell it to ditch the item picked up
+            return item;
+        } 
+
+
+
+        if(currentItem.item.fanciness < item.item.fanciness 
+            || (currentItem.item.fanciness == item.item.fanciness && currentItem.item.points < item.item.points)){
+            this.furnitureInventory[item.item.type] = item;
+            //Put this item in the scene (but also ditch the item picked up)
+            return currentItem;
+        }
+        //Don't do anything
+        return null;
+    }
+
+    findFurnitureByType(type) {
+        return this.furnitureInventory[type];
+    }
+
+    getScore() {
+        var score = 0;
+        for (var prop in this.furnitureInventory){
+            score += this.furnitureInventory[prop] ? this.furnitureInventory[prop].item.points : 0;
+        }
+
+        return score;
+    }
+
 } 
