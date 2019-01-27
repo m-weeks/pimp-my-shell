@@ -157,6 +157,25 @@ function endGame() {
         }
     }
 
+    let crabImage;
+
+    switch (winner) {
+        case 0:
+            crabImage = 'assets/crabs/bluecrab/bluecrabbase.png'
+            break;
+        case 1:
+            crabImage = 'assets/crabs/greencrab/greencrabbase.png'
+            break;
+        case 2:
+            crabImage = 'assets/crabs/purplecrab/purplecrabbase.png'
+            break;
+        case 3:
+            crabImage = 'assets/crabs/yellowcrab/yellowcrabbase.png'
+            break;
+    }
+
+    document.querySelector('.crab').src = crabImage;
+
     document.querySelector('#audio source').src = 'assets/audio/victory.mp3';
     document.querySelector('#audio').play();
 
