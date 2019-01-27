@@ -4,7 +4,7 @@ import SpectatorScene from './SpectatorScene';
 import VirtualJoyStickPlugin  from './plugins/rexvirtualjoystickplugin.min';
 import { MAP_WIDTH, MAP_HEIGHT, MSG_TYPE_NEW_CONNECTION, MSG_TYPE_NEW_PLAYER, GAME_LENGTH_SECS } from './constants';
 import conn from './conn';
-import { ENGINE_METHOD_PKEY_ASN1_METHS } from 'constants';
+
 let scene;
 let currentSecs = GAME_LENGTH_SECS;
 let wid;
@@ -56,7 +56,7 @@ if (window.startGame) {
 function startGame() {
     
     if ( window.spectator){
-
+        document.getElementById('audio').pause();
         timer = setInterval(function () {
             currentSecs--;
             document.getElementById("timer").innerHTML = getTimeString(currentSecs);
@@ -68,7 +68,7 @@ function startGame() {
     
     var a = document.querySelector(".lobby") ? document.querySelector(".lobby").style.display = "none" : '';
     a = document.querySelector("#scores") ? document.querySelector("#scores").style.display = "block" : '';
-  
+    
     game = new Phaser.Game(config);
 }
 
@@ -92,8 +92,15 @@ conn.onmessage = function (msg) {
         case MSG_TYPE_NEW_PLAYER:
             if (window.currentPlayerName < window.numPlayers) {
                 window.playerNames[msg.resourceId] = msg.name;
-                document.getElementById("name" + window.currentPlayerName).innerHTML = msg.name;
+                document.querySelector("#name" + window.currentPlayerName + " .name-text").innerHTML = msg.name;
+                document.querySelector("#name" + window.currentPlayerName).style.display = "flex";
                 document.getElementById("scorename" + window.currentPlayerName).innerHTML = msg.name;
+                document.getElementById("score" + window.currentPlayerName).style.display = "flex";
+                
+                if ( window.currentPlayerName >= 1){
+                    document.getElementById("startGame").style.display = "block";
+                }
+
                 window.currentPlayerName++;
             }
             break;

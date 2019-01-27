@@ -3,6 +3,9 @@ export const MSG_TYPE_NEW_CONNECTION = 'newConnection';
 export const MSG_TYPE_PLAYER_POWER = 'playerPower';
 export const MSG_TYPE_CLOSE_CONNECTION = 'closeConnection';
 export const MSG_TYPE_NEW_PLAYER = 'newPlayer';
+export const MSG_TYPE_UPDATED_INVENTORY = 'updatedInventory';
+export const MSG_TYPE_YOUR_ID = 'yourId';
+
 export const GAME_LENGTH_SECS = 11 + (4 * 60);
 
 export const POWER_TYPE_SPEED = 'speed';

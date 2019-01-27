@@ -1,6 +1,8 @@
 import 'phaser';
 import conn from './conn';
-import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_PLAYER_POWER, POWER_TYPE_SPEED } from './constants';
+import { MSG_TYPE_PLAYER_MOVE, MSG_TYPE_PLAYER_ATTACK, MSG_TYPE_UPDATED_INVENTORY, MSG_TYPE_YOUR_ID, POWER_TYPE_SPEED, MSG_TYPE_PLAYER_POWER } from './constants';
+
+let myId = null;
 
 export default class Scene extends Phaser.Scene {
     preload() {
@@ -52,7 +54,20 @@ export default class Scene extends Phaser.Scene {
 
         conn.onmessage = function (msg) {
             msg = JSON.parse(msg.data);
+            switch (msg.type) {
+                case MSG_TYPE_UPDATED_INVENTORY:
+                    if (myId == msg.playerId) {
+                        console.log ('update my inventory')
+                        console.log(msg.inventory)
+                    }
+                    break;
+                case MSG_TYPE_YOUR_ID:
+                    myId = msg.resourceId;
+                    break;
+            };
         };
+        
+        conn.send(JSON.stringify({type: MSG_TYPE_YOUR_ID}));
     }
 
     update() {

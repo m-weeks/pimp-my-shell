@@ -33,6 +33,8 @@ class GameEngine implements MessageComponentInterface
     {
         echo "connected: " . $conn->resourceId . "\n";
         $this->clients->attach($conn);
+
+
         foreach($this->clients as $client) {
             if ($conn->resourceId !== $client->resourceId){
                 $connection_obj = array(
@@ -41,6 +43,13 @@ class GameEngine implements MessageComponentInterface
                 );
 
 
+                $client->send(json_encode($connection_obj));
+            }else {
+
+                $connection_obj = array(
+                    'type' => 'yourId',
+                    'resourceId' => $conn->resourceId
+                );
                 $client->send(json_encode($connection_obj));
             }
         }
@@ -91,14 +100,21 @@ class GameEngine implements MessageComponentInterface
      */
     function onMessage(Ratchet\ConnectionInterface $from, $msg)
     {
+        
+        
+
         $message = json_decode($msg);
         
         $message->resourceId = $from->resourceId;
-        
+
+        if ($message->type == 'yourId'){
+            $from->send(json_encode($message));
+        } else {
         foreach($this->clients as $client){
             if ($from !== $client){
                 $client->send(json_encode($message));
             }
         }
+    }
     }
 }

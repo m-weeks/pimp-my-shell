@@ -17,10 +17,6 @@ if ( window.connect){
             conn.send(JSON.stringify(msg));
         }
     };
-    
-    
-    
-    
 }
 
 function getCookie(cname) {
