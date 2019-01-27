@@ -70,18 +70,31 @@ export default class Scene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         // Player creation
+        console.log(currentPlayer);
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4, 'crab1'), this));
+        cameras.push(this.cameras.main);
+
         players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4, 'crab2'), this));
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'), this));
-        players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'crab4'), this));
+        cameras.push(this.cameras.add(width + CAMERA_GUTTER, 0, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
+
+        if (currentPlayer >= 3) {
+            players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4, MAP_HEIGHT / 4 * 3, 'crab3'), this));
+            cameras.push(this.cameras.add(0, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
+        }
+        
+        if (currentPlayer >= 4) {
+            players.push(new Player(this.physics.add.sprite(MAP_WIDTH / 4 * 3, MAP_HEIGHT / 4 * 3, 'crab4'), this));
+            cameras.push(this.cameras.add(width + CAMERA_GUTTER, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
+        }
+
 
         this.cameras.main.setSize(width - CAMERA_GUTTER, height - CAMERA_GUTTER);
         this.cameras.main.setPosition(0, 0);
 
-        cameras.push(this.cameras.main);
-        cameras.push(this.cameras.add(width + CAMERA_GUTTER, 0, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
-        cameras.push(this.cameras.add(0, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
-        cameras.push(this.cameras.add(width + CAMERA_GUTTER, height + CAMERA_GUTTER, width - CAMERA_GUTTER, height - CAMERA_GUTTER));
+        
+        
+        
+        
 
         let cameraCenterX = width / 2;
         let cameraCenterY = height / 2;
