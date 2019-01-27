@@ -5,7 +5,7 @@ import {
     LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
     MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
     HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART,
-    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION, MAX_TICK
+    MAP_HEIGHT, MAP_WIDTH, MSG_TYPE_CLOSE_CONNECTION, MAX_TICK, MSG_TYPE_UPDATED_INVENTORY
 } from './constants';
 import Plant from './classes/Plant';
 import Lamp from './classes/Lamp';
@@ -92,10 +92,6 @@ export default class Scene extends Phaser.Scene {
         this.spawnItems(10);
 
 
-
-
-
-
         players.forEach(player => {
             this.physics.add.overlap(player.sprite, items, function (sprite, item) { this.itemCollision(player, item); }, undefined, this);
         });
@@ -109,9 +105,6 @@ export default class Scene extends Phaser.Scene {
             camera.startFollow(players[index].sprite);
             camera.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
         });
-
-
-
 
 
         conn.onmessage = function (msg) {
@@ -214,7 +207,7 @@ export default class Scene extends Phaser.Scene {
         item.setActive(false);
         item.setVisible(false);
         item.body.enable = false;
-     }
+    }
 
     throwItem(item, player) {
         item.setActive(true);
@@ -262,13 +255,23 @@ function createItem(scene, furniture, x, y) {
     item.body.setOffset(250,250);
     
     item.setDepth(1);
-  
 }
-
 
 function updateScores() {
     players.forEach((player, index) => {
         document.getElementById("scorenumber" + index).innerHTML = player.getScore();
     });
+    sendUpdatedInventory();
+}
+
+function sendUpdatedInventory() {
+    for (var resourceId in connectionIds) {
+        var msg = {
+            type: MSG_TYPE_UPDATED_INVENTORY,
+            inventory: players[connectionIds[resourceId]].furnitureInventory,
+            playerId: resourceId
+        };
+        conn.send(JSON.stringify(msg));
+    };
 }
 
