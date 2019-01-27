@@ -66,7 +66,7 @@ export default class Scene extends Phaser.Scene {
         this.load.image('arrow', 'assets/arrow.png');
         this.load.image('map', 'assets/island.png');
 
-        this.load.audio('pedro', ['assets/audio/pedro.mp3']);
+        this.load.audio('main', ['assets/audio/main.mp3']);
         this.load.audio('snip', ['assets/audio/snip.wav'])
 
         // Load furniture images
@@ -167,7 +167,7 @@ export default class Scene extends Phaser.Scene {
             };
         };
 
-        this.music = this.sound.add('pedro');
+        this.music = this.sound.add('main');
         this.music.play();
     }
 
