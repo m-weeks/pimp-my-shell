@@ -145,8 +145,6 @@ function endGame() {
     // };
     // conn.send(JSON.stringify(msg));
 
-    
-
     let inventory = window.playerArray[winner].furnitureInventory;
 
     // TODO: Change to constants
@@ -158,6 +156,9 @@ function endGame() {
             document.querySelector('.'+types[i]).src = 'assets/' + item.item.image + '.png';
         }
     }
+
+    document.querySelector('#audio source').src = 'assets/audio/victory.mp3';
+    document.querySelector('#audio').play();
 
     game.destroy(true);
 }

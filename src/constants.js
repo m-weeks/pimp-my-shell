@@ -7,7 +7,7 @@ export const MSG_TYPE_UPDATED_INVENTORY = 'updatedInventory';
 export const MSG_TYPE_YOUR_ID = 'yourId';
 export const MSG_TYPE_END_GAME = 'endGame';
 
-export const GAME_LENGTH_SECS = 0 + (1 * 60);
+export const GAME_LENGTH_SECS = 11 + (2 * 60);
 
 export const POWER_TYPE_SPEED = 'speed';
 
