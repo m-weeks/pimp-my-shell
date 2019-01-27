@@ -75,9 +75,10 @@
     </div>
 
     <div id="endgame" style="flex-direction: column; justify-content: center; align-items: center;">
+        <span style="color: aquamarine;font-size: 45px;-webkit-text-stroke: 1px black;">Winner:</span>
         <span id="winner"></span>
         <span id="winscore"></span>
-        <div class="shellScene">
+        <div class="shellScene" style="border: 5px solid black;">
             <img class="furniture art" width='150px' src="">
             <img class="furniture tv" width='300px' src="">
             <img class="furniture antenna" width='125px' src="">
@@ -134,7 +135,7 @@
             width: 400px;
             top: 80px;
             z-index: 2;
-            left: 230px;
+            left: 200px;
         }
 
         .plant {
@@ -145,7 +146,7 @@
         }
 
         .rug {
-            bottom: -20px;
+            bottom: -80px;
             left: 400px;
             width: 350px;
             z-index: 1;
@@ -188,9 +189,15 @@
 
         #endgame {
             display: none;
+            height: 100vh;
+            width: 100vw;
             color: aquamarine;
             font-size: 45px;
             -webkit-text-stroke: 1px black;
+            background-image: url('/assets/beach.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
         }
 
         .lobby {
