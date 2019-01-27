@@ -33,6 +33,9 @@ var config = {
 
     physics: {
         default: 'arcade',
+        arcade: {
+            debug: true
+        }
     },
     input: {
         activePointers: 3

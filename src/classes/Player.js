@@ -8,6 +8,8 @@ export default class Player {
         this.sprite.setScale(0.25,0.25);
 
         this.snip = scene.sound.add('snip');
+        this.pop = scene.sound.add('pop');
+        this.thud = scene.sound.add('thud');
 
         this.walkanim = scene.anims.create({
             key: 'walk-' + this.key,
@@ -27,7 +29,7 @@ export default class Player {
         this.attackanim = scene.anims.create({
             key: 'attack-' + this.key,
             frames: scene.anims.generateFrameNumbers(this.key, { start: 0, end: 1 }),
-            frameRate: 4,
+            frameRate: 6,
             duration: 500,
             repeat: 0
         });
@@ -58,20 +60,24 @@ export default class Player {
             if(curplayer != this){
                 this.scene.physics.add.collider(attackHitbox, curplayer.sprite, function(){
                     if (!curplayer.invincible) {
-                        console.log("hit")
                         curplayer.invincible = true;
                         curplayer.sprite.setAlpha(0.5);
+                        let item = curplayer.pickRandomItem();
+                        if(item != null) {
+                            this.scene.throwItem(item, curplayer);
+                            curplayer.removeItem(item);
+                        }
                         setTimeout(() => {
                             curplayer.invincible = false;
                             curplayer.sprite.setAlpha(1);
                         }, 2000);
                     }
-                });
+                }, undefined, this);
             }
         });
         setTimeout(() => {
             attackHitbox.destroy();
-        }, 100);
+        }, 200);
 
     }
 
@@ -99,16 +105,16 @@ export default class Player {
         
         if (!currentItem) {
             this.furnitureInventory[item.item.type] = item;
+            this.pop.play();
             //Tell it to ditch the item picked up
             return item;
         } 
 
-
-
         if(currentItem.item.fanciness < item.item.fanciness 
             || (currentItem.item.fanciness == item.item.fanciness && currentItem.item.points < item.item.points)){
             this.furnitureInventory[item.item.type] = item;
-            //Put this item in the scene (but also ditch the item picked up)
+            this.pop.play();
+            // Return the item to put back in the scene
             return currentItem;
         }
         //Don't do anything
@@ -126,6 +132,27 @@ export default class Player {
         }
 
         return score;
+    }
+
+    pickRandomItem() {
+        let keys = Object.keys(this.furnitureInventory);
+        // randomize keys
+        keys.sort(function() { return 0.5 - Math.random()});
+        let result = null;
+        for (let i = 0; i < keys.length; i++){
+            if(this.furnitureInventory[keys[i]] != null) {
+                result = this.furnitureInventory[keys[i]];
+            }
+        }
+        return result;
+    }
+
+    removeItem(item) {
+        for (let prop in this.furnitureInventory) {
+            if (item == this.furnitureInventory[prop]) {
+                this.furnitureInventory[prop] = null;
+            }
+        }
     }
 
 } 
