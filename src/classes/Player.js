@@ -8,6 +8,8 @@ export default class Player {
         this.sprite.setScale(0.25,0.25);
 
         this.snip = scene.sound.add('snip');
+        this.pop = scene.sound.add('pop');
+        this.thud = scene.sound.add('thud');
 
         this.walkanim = scene.anims.create({
             key: 'walk-' + this.key,
@@ -27,10 +29,15 @@ export default class Player {
         this.attackanim = scene.anims.create({
             key: 'attack-' + this.key,
             frames: scene.anims.generateFrameNumbers(this.key, { start: 0, end: 1 }),
-            frameRate: 4,
+            frameRate: 6,
             duration: 500,
-            repeat: 0
+            repeat: 0            
         });
+        this.sprite.on('animationcomplete', function(animation) {
+            if (animation == this.attackanim) {
+                this.attacking = false;
+            }
+        }, this);
         
         this.sprite.anims.play('still-' + this.key);
 
@@ -53,31 +60,51 @@ export default class Player {
         this.sprite.anims.play('attack-' + this.key);
         this.snip.play();
         attackHitbox.body.moves = false;
+        this.attacking = true;
 
         players.forEach(curplayer => {
             if(curplayer != this){
-                this.scene.physics.add.collider(attackHitbox, curplayer.sprite, function(){
+                this.scene.physics.add.overlap(attackHitbox, curplayer.sprite, function(){
                     if (!curplayer.invincible) {
-                        console.log("hit")
                         curplayer.invincible = true;
                         curplayer.sprite.setAlpha(0.5);
+                        curplayer.knockBack(this.sprite.angle);
+                        let item = curplayer.pickRandomItem();
+                        if(item != null) {
+                            this.scene.throwItem(item, curplayer);
+                            curplayer.removeItem(item);
+                        }
                         setTimeout(() => {
                             curplayer.invincible = false;
                             curplayer.sprite.setAlpha(1);
                         }, 2000);
                     }
-                });
+                }, undefined, this);
             }
         });
         setTimeout(() => {
             attackHitbox.destroy();
         }, 100);
+    }
 
+    knockBack(angle) {
+        angle = this.toRad(angle);
+        let x = this.sprite.x + Math.cos(angle) * 150;
+        let y = this.sprite.y + Math.sin(angle) * 150;
+        this.scene.tweens.add({
+            targets: this.sprite, 
+            duration: 750,
+            ease: 'Quart.easeOut',
+            x: x,
+            y: y
+        });
     }
 
     move(angle,force){
         if (force != 0){
-            this.sprite.anims.play('walk-' + this.key, true);
+            if(!this.attacking) {
+                this.sprite.anims.play('walk-' + this.key, true);
+            }
         }else{
             this.sprite.anims.play('still-' + this.key);
         }
@@ -99,16 +126,16 @@ export default class Player {
         
         if (!currentItem) {
             this.furnitureInventory[item.item.type] = item;
+            this.pop.play();
             //Tell it to ditch the item picked up
             return item;
         } 
 
-
-
         if(currentItem.item.fanciness < item.item.fanciness 
             || (currentItem.item.fanciness == item.item.fanciness && currentItem.item.points < item.item.points)){
             this.furnitureInventory[item.item.type] = item;
-            //Put this item in the scene (but also ditch the item picked up)
+            this.pop.play();
+            // Return the item to put back in the scene
             return currentItem;
         }
         //Don't do anything
@@ -128,4 +155,24 @@ export default class Player {
         return score;
     }
 
+    pickRandomItem() {
+        let keys = Object.keys(this.furnitureInventory);
+        // randomize keys
+        keys.sort(function() { return 0.5 - Math.random()});
+        let result = null;
+        for (let i = 0; i < keys.length; i++){
+            if(this.furnitureInventory[keys[i]] != null) {
+                result = this.furnitureInventory[keys[i]];
+            }
+        }
+        return result;
+    }
+
+    removeItem(item) {
+        for (let prop in this.furnitureInventory) {
+            if (item == this.furnitureInventory[prop]) {
+                this.furnitureInventory[prop] = null;
+            }
+        }
+    }
 } 

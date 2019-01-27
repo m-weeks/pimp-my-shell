@@ -18,30 +18,9 @@ import Art from './classes/Art';
 import { LOW_FANCINESS, HIGH_FANCINESS, MID_FANCINESS } from './classes/Furniture';
 
 let FURNITURE_NAMES = [
-    LOW_PLANT,
-    LOW_LAMP, 
-    LOW_RUG    , 
-    LOW_BOOKSHELF, 
-    LOW_COUCH  , 
-    // LOW_ANTENNA, 
-    LOW_TV     , 
-    LOW_ART    , 
-    MID_PLANT,
-    // MID_LAMP   , 
-    MID_RUG    , 
-    // MID_BOOKSHELF, 
-    // MID_COUCH  , 
-    // MID_ANTENNA, 
-    MID_TV     , 
-    // MID_ART    , 
-    HIGH_PLANT,
-    // HIGH_LAMP  , 
-    // HIGH_RUG   , 
-    // HIGH_BOOKSHELF, 
-    HIGH_COUCH , 
-    // HIGH_ANTENNA, 
-    // HIGH_TV    , 
-    // HIGH_ART     
+    LOW_PLANT, LOW_LAMP, LOW_RUG, LOW_BOOKSHELF, LOW_COUCH, LOW_ANTENNA, LOW_TV, LOW_ART,
+    MID_PLANT, MID_LAMP, MID_RUG, MID_BOOKSHELF, MID_COUCH, MID_ANTENNA, MID_TV, MID_ART,
+    HIGH_PLANT, HIGH_LAMP, HIGH_RUG, HIGH_BOOKSHELF, HIGH_COUCH, HIGH_ANTENNA, HIGH_TV, HIGH_ART
 ];
 import Player from './classes/Player'
 let connectionIds;
@@ -67,7 +46,9 @@ export default class Scene extends Phaser.Scene {
         this.load.image('map', 'assets/island.png');
 
         this.load.audio('main', ['assets/audio/main.mp3']);
-        this.load.audio('snip', ['assets/audio/snip.wav'])
+        this.load.audio('snip', ['assets/audio/snip.wav']);
+        this.load.audio('pop', ['assets/audio/pop.mp3']);
+        this.load.audio('thud', ['assets/audio/thud.wav']);
 
         // Load furniture images
         FURNITURE_NAMES.forEach(name => {
@@ -129,7 +110,7 @@ export default class Scene extends Phaser.Scene {
 
 
         players.forEach(player => {
-            this.physics.add.overlap(player.sprite, items, function (sprite, item) { itemCollision(player, item); });
+            this.physics.add.overlap(player.sprite, items, function (sprite, item) { this.itemCollision(player, item); }, undefined, this);
         });
 
         players.forEach(player => {
@@ -210,7 +191,6 @@ export default class Scene extends Phaser.Scene {
             }
 
             var type = Math.random() * 100;
-            console.log(type);
             var item;
 
             switch(true){
@@ -242,6 +222,46 @@ export default class Scene extends Phaser.Scene {
             createItem(this, item, (Math.random() * (MAP_WIDTH - 300)) + 150, (Math.random() * (MAP_HEIGHT - 300)) + 150);
         }
     }
+
+    removeItem(item) {
+        item.setActive(false);
+        item.setVisible(false);
+        item.body.enable = false;
+     }
+
+    throwItem(item, player) {
+        item.setActive(true);
+        item.setVisible(true);
+        item.x = (player.sprite.x + player.sprite.body.width / 2) - (item.body.width / 2);
+        item.y = (player.sprite.y + player.sprite.body.height / 2) - (item.body.height / 2);
+        let angle = Math.random() * 2 * Math.PI;
+        let x = item.x + Math.cos(angle) *200;
+        let y = item.y + Math.sin(angle) * 200;
+        this.tweens.add({
+            targets: item, 
+            duration: 500,
+            x: x,
+            y: y,
+            ease: 'Quart.easeOut',
+            onComplete: function() {
+                player.thud.play();
+                item.body.enable = true;
+            }
+        });
+    }
+
+    itemCollision(player, item) {
+        //check player inventory for items of this type
+        let removedItem = player.addToFurnitureInventory(item);
+        if (removedItem == item) {
+            this.removeItem(item);
+        }else if (removedItem && removedItem != item) {
+            this.removeItem(item);
+            this.throwItem(removedItem, player);
+        }
+        
+        updateScores();
+    }
 }
 
 function createItem(scene, furniture, x, y) {
@@ -258,32 +278,8 @@ function createItem(scene, furniture, x, y) {
   
 }
 
-function itemCollision(player, item) {
-
-
-    //check player inventory for items of this type
-    let removedItem = player.addToFurnitureInventory(item);
-    console.log(removedItem);
-    if (removedItem == item) {
-        removeItem(item);
-    } else if (removedItem && removedItem != item) {
-        removeItem(item)
-        //put removed item in scene behind player
-        console.log("put item behind player");
-    }
-
-    updateScores();
-
-
-}
-
-
-function removeItem(item) {
-    item.destroy();
-}
 
 function updateScores() {
-    console.log(players[0].getScore());
     players.forEach((player, index) => {
         document.getElementById("scorenumber" + index).innerHTML = player.getScore();
     });
