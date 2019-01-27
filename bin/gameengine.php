@@ -54,6 +54,18 @@ class GameEngine implements MessageComponentInterface
     function onClose(Ratchet\ConnectionInterface $conn)
     {
         echo $conn->resourceId . " has disconnected\n";
+
+        $message = array(
+            'resourceId' => $conn->resourceId,
+            'type' => 'closeConnection'
+        );
+        
+        foreach($this->clients as $client){
+            if ($conn !== $client){
+                $client->send(json_encode($message));
+            }
+        }
+
         $this->clients->detach($conn);
     }
 

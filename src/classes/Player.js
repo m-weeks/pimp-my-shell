@@ -128,7 +128,7 @@ export default class Player {
     getScore() {
         var score = 0;
         for (var prop in this.furnitureInventory){
-            score += this.furnitureInventory[prop] ? this.furnitureInventory[prop].item.points : 0;
+            score += Math.floor(this.furnitureInventory[prop] ? this.furnitureInventory[prop].item.points : 0);
         }
 
         return score;
