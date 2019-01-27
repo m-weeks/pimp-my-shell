@@ -3,6 +3,9 @@
 
 <head>
     <meta charset="utf-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Freckle+Face|Nanum+Pen+Script');
+    </style>
     <script>
         window.connect = true;
         window.spectator = true;
@@ -12,20 +15,38 @@
 <body style="margin: 0;">
     <script src="build/project.bundle.js" charset="utf-8"></script>
     <div class="lobby">
-        <div class="player-name" id="name0">
-
+        <div class="title">
+            <h1>Pimp My Shell!</h1>
+            <h2>Go to pimpmyshell.com on your phone!</h2>
         </div>
-        <div class="player-name" id="name1">
-
+        <div class="names">
+            <div class="player-name" id="name0">
+                <img src="assets/crabs/bluecrab/bluecrabbase.png" />
+                <span class="name-text">Graham</span>
+            </div>
+            <div class="player-name" id="name1">
+                    <img src="assets/crabs/greencrab/greencrabbase.png" />
+                    <span class="name-text">Graham</span>
+            </div>
+            <div class="player-name" id="name2">
+                    <img src="assets/crabs/purplecrab/purplecrabbase.png" />
+                    <span class="name-text">Graham</span>
+            </div>
+            <div class="player-name" id="name3">
+                    <img src="assets/crabs/yellowcrab/yellowcrabbase.png" />
+                    <span class="name-text">Graham</span>
+            </div>
         </div>
-        <div class="player-name" id="name2">
-
+        <span id="startGame">Start Game</span>
+        <div class="instructions">
+            The Hermit Crabs on Sunshine Island are in luck! A cargo ship sank nearby and a bunch of furniture has
+            washed up on shore! Finally, they can trick out their homes with amazing items!<br /><br />
+            Head around the island and collect the best furniture - but watch out! Other crabs might try to steal your
+            sweet stuff!
         </div>
-        <div class="player-name" id="name3">
-
-        </div>
-
-        <button id="startGame">Start Game</button>
+        <audio autoplay id="audio">
+            <source src="assets/audio/lobby.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
 
@@ -37,19 +58,19 @@
             <span id="scorenumber0">0</span>
         </div>
         <div id="score1" class="scorebox right" style="position: fixed; top: 0; right: 0">
-                <span id="scorename1">e</span>
-                <span id="scorenumber1">0</span>
+            <span id="scorename1">e</span>
+            <span id="scorenumber1">0</span>
         </div>
 
-        <div id="timer" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(255,255,255,0.3); border-radius: 25px; border: 3px solid black; text-align: center; padding: 15px;">4:11</div>
+        <div id="timer" style="font-size: 30px; color: orange; -webkit-text-stroke: 1px black;  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(255,255,255,0.7); border-radius: 25px; border: 3px solid black; text-align: center; padding: 15px;">4:11</div>
 
         <div id="score2" class="scorebox" style="position: fixed; bottom: 0; left: 0">
-                <span id="scorename2">s</span>
-                <span id="scorenumber2">0</span>
+            <span id="scorename2">s</span>
+            <span id="scorenumber2">0</span>
         </div>
         <div id="score3" class="scorebox right" style="position: fixed; bottom: 0; right: 0">
-                <span id="scorename3">t</span>
-                <span id="scorenumber3">0</span>
+            <span id="scorename3">t</span>
+            <span id="scorenumber3">0</span>
         </div>
     </div>
 
@@ -59,6 +80,11 @@
     </div>
 
     <style>
+        html {
+
+            font-family: 'Freckle Face', cursive;
+        }
+
         .scorebox {
             background-color: white;
             border-radius: 25px;
@@ -68,7 +94,7 @@
             margin: 10px;
             opacity: 0.7;
             min-width: 100px;
-            display: flex;
+            display: none;
             flex-direction: column;
         }
 
@@ -90,10 +116,111 @@
             width: 100vw;
             display: flex;
             flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background-image: url('/assets/beach.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        .title {
+            text-align: center;
+    
+        }
+
+        h1 {
+            font-size: 60px;
+            color:aquamarine;
+            -webkit-text-stroke: 1px black;
+        }
+
+        h2 {
+            font-size: 45px;
+            color: yellow;
+            -webkit-text-stroke: 1px black;
+        }
+
+        .names {
+            display: flex;
+            flex-direction: row;
             justify-content: center;
             align-items: center;
         }
+
+        .instructions {
+            text-align: center;
+            font-size: 22px;
+            margin-left: 15vw;
+            margin-right: 15vw;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            border: 3px solid black;
+            padding: 15px;
+            font-family: 'Nanum Pen Script', cursive;
+        }
+
+        #startGame {
+            font-size: 30px;
+            color: deeppink;
+            -webkit-text-stroke: 1px black;
+            padding: 15px;
+            border-radius: 25px;
+            background-color: rgba(255,255,255,0.6);
+            display: none;
+        }
+
+        #startGame:hover {
+            cursor: pointer;
+            
+        }
+
+        .player-name{
+            font-size: 30px;
+            -webkit-text-stroke: 1px black;
+            height: 15vw;
+            margin: 15px;
+            padding: 15px;
+            
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            border: 3px solid black;
+            border-radius: 25px;
+            background-color: rgba(255,255,255,0.6);
+            width: 15vw;
+            display: none;
+        }
+
+        #name0 {
+            color: aqua;
+        }
+
+        #name1 {
+            color: chartreuse;
+        }
+
+        #name2 {
+            color: fuchsia;
+        }
+
+        #name3 {
+            color: yellow;
+        }
+
+        .player-name img {
+            width: 100%;
+            height: auto;
+        }
+
     </style>
+    <script>
+document.addEventListener('click', musicPlay);
+function musicPlay() {
+    document.getElementById('audio').play();
+    document.removeEventListener('click', musicPlay);
+}
+    </script>
 </body>
 
 </html>
