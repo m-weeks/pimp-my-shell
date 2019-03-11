@@ -1,17 +1,10 @@
-# Phaser 3 Webpack Project Template
+# Pimp My Shell
 
-A Phaser 3 Project Template
+Pimp My Shell is a game where you play as a hermit crab on an island where a cargo ship carrying furniture has recently crashed. The objective of the game is to collect the best furniture, to pimp your shell.
 
-### Requirements
+This game has two sections, the phone interface and the desktop interface.
 
-We need [Node.js](https://nodejs.org) to install and run scripts.
+The phone interface will have controls on it, and will send signals via a websocket server to the desktop interface.
 
-## Install and run
+The desltop interface will receive signals from the websocket server and move each players crab around the map. There can be up to 4 players at a time.
 
-Run next commands in your terminal:
-
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install dependencies and launch browser with examples.|
-| `npm start` | Launch browser to show the examples. <br> Press `Ctrl + c` to kill **http-server** process. |
-=======
