@@ -8,3 +8,5 @@ The phone interface will have controls on it, and will send signals via a websoc
 
 The desltop interface will receive signals from the websocket server and move each players crab around the map. There can be up to 4 players at a time.
 
+
+View Credits, screenshots, and other information at http://gamewithus.ca/games/?gameID=150
